@@ -145,7 +145,8 @@ const AddProduct=({
           
     
           console.log("Backend response:", response.data);
-    
+            closeAddItemsPopup()
+           window.location.reload()
           const uploadedImage = response.data.productImage;
           console.log("Uploaded image data:", uploadedImage);
     
@@ -161,7 +162,7 @@ const AddProduct=({
               ...prev,
               [fieldName]: imageUrl,
             }));
-           
+         
           } else {
             console.error("Image URL is not found for the given field.");
           }
