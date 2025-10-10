@@ -27,7 +27,7 @@ const ViewRestore=()=>{
       fetchRestoreItem()
     },[id])
 
- const exportPDF = (id) => {
+ const exportPDF = () => {
   const input = document.getElementById("page-to-pdf");
 
   html2canvas(input, { scale: 2 }).then((canvas) => {
@@ -37,42 +37,36 @@ const ViewRestore=()=>{
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const margin = 10; // margin on all sides
+    const margin = 10; // 10mm margin on all sides
     const imgWidth = pageWidth - margin * 2;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
     let heightLeft = imgHeight;
-    let position = margin + 20; // space for heading
+    let position = margin + 20; // leave space for heading
 
-    // === 🏷️ Add Heading ===
-    const heading = `Restore Items for #${id}`;
+    // Add heading
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(16);
-    const textWidth = pdf.getTextWidth(heading);
-    pdf.text(heading, (pageWidth - textWidth) / 2, margin + 10); // centered title
+    pdf.setFontSize(18);
+    const title = `Restore Items for ${id}`;
+    const titleWidth = pdf.getTextWidth(title);
+    pdf.text(title, (pageWidth - titleWidth) / 2, margin + 10); // Centered title
 
-    // === 🖼️ Add First Page Content ===
+    // Add first page content
     pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
     heightLeft -= pageHeight - position;
 
-    // === 📄 Handle Extra Pages ===
+    // Add extra pages if content exceeds one page
     while (heightLeft > 0) {
       pdf.addPage();
       position = margin;
-      pdf.addImage(
-        imgData,
-        "PNG",
-        margin,
-        position - (imgHeight - heightLeft),
-        imgWidth,
-        imgHeight
-      );
+      pdf.addImage(imgData, "PNG", margin, position - (imgHeight - heightLeft), imgWidth, imgHeight);
       heightLeft -= pageHeight - margin;
     }
 
-    pdf.save(`Restore_Items_${id}.pdf`);
+    pdf.save("Restore_Details");
   });
 };
+
 
 
 
