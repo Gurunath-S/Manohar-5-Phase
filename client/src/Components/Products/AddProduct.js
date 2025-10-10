@@ -113,6 +113,7 @@ const AddProduct=({
       //  if(weight.weightdata!==null && weight.weightdata!==undefined){
         let id= await createNewProduct();
         setNewId(id)
+        closeAddItemsPopup()
       //   switch (fieldName) {
       //     case "before_weight_img":
       //         setBeforeWeight(weight.weightdata);
@@ -145,9 +146,8 @@ const AddProduct=({
           
     
           console.log("Backend response:", response.data);
-            closeAddItemsPopup()
-           window.location.reload()
-          const uploadedImage = response.data.productImage;
+           
+         const uploadedImage = response.data.productImage;
           console.log("Uploaded image data:", uploadedImage);
     
     
