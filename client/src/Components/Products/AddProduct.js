@@ -98,6 +98,10 @@ const AddProduct=({
         `${REACT_APP_BACKEND_SERVER_URL}/api/v1/products/create`,
         payload
       );
+      setProducts((prevProducts) => [
+          ...prevProducts,
+          response.data.newProduct,
+        ]);
 
      return response.data.newProduct.id;
     } catch (error) {
