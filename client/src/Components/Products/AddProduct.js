@@ -112,30 +112,30 @@ const AddProduct=({
   
   const uploadImage = async (image, fieldName) => {
     try {
-      // const weight = await handleWeight(); 
-      // console.log(weight.weightdata);
-      //  if(weight.weightdata!==null && weight.weightdata!==undefined){
+      const weight = await handleWeight(); 
+      console.log(weight.weightdata);
+       if(weight.weightdata!==null && weight.weightdata!==undefined){
         let id= await createNewProduct();
         setNewId(id)
         closeAddItemsPopup()
-      //   switch (fieldName) {
-      //     case "before_weight_img":
-      //         setBeforeWeight(weight.weightdata);
-      //         break;
-      //     case "after_weight_img":
-      //         setAfterWeight(weight.weightdata);
-      //         break;
-      //     case "final_weight_img":
-      //         setFinalWeight(weight.weightdata);
-      //         break;
-      //     default:
-      //         console.warn("Invalid field:", fieldName);
-      // }
+        switch (fieldName) {
+          case "before_weight_img":
+              setBeforeWeight(weight.weightdata);
+              break;
+          case "after_weight_img":
+              setAfterWeight(weight.weightdata);
+              break;
+          case "final_weight_img":
+              setFinalWeight(weight.weightdata);
+              break;
+          default:
+              console.warn("Invalid field:", fieldName);
+      }
         try {
           const formData = new FormData();
           formData.append("image", image);
           formData.append("fieldName", fieldName);
-         formData.append("productId", id);
+          formData.append("productId", id);
           console.log("FormData contains image:", formData.get("image"));
     
           const response = await axios.post(
@@ -172,18 +172,10 @@ const AddProduct=({
           }
         } catch (error) {
           console.error("Error uploading image:", error);
-        }
-
-       
-    
-      //  }
-     
-  } catch (err) {
+        }}
+     } catch (err) {
       console.error("Error fetching weight:", err);
-  }
-    
-     
-
+    }
     
   };
 
