@@ -147,9 +147,7 @@ const AddProduct=({
               },
             }
           );
-          
-    
-          console.log("Backend response:", response.data);
+         console.log("Backend response:", response.data);
            
          const uploadedImage = response.data.productImage;
           console.log("Uploaded image data:", uploadedImage);
