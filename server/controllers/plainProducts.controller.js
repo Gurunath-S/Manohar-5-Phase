@@ -139,34 +139,5 @@ exports.delete_Plain_Products=async(req,res)=>{
      }
 }
 
-exports.getPlain_LotInfo_ByLotId=async(req,res)=>{
-     const {id}=req.params
-     try{
-       if(isNaN(id)) return res.status(400).json({message:"Invalid Id"})
 
-       const existProduct=await prisma.plainLot.findUnique({
-        where:{
-          id:parseInt(id)
-        },
-       
-      })
-      
-      if(!existProduct) return res.status(400).json({message:"Lot Not Found In Db"})
-
-        const products=await prisma.plainLot.findUnique({
-          where:{
-            id:parseInt(id)
-          },
-          include:{
-            plainProduct:true
-          }
-        })
-
-        return res.status(200).json({success:true,products})
-
-     }catch(err){
-         console.log('err',err.message)
-         return res.status(500).json({err:err.message})
-     }
-    }
 
