@@ -55,7 +55,7 @@ exports.getPlainLotById = async (req, res) => {
       },
     });
     
-    return res.status(200).json({success:true,lotInfo})
+    return res.status(200).json({success:true,lotInfo:lotInfo||[]})
 
   } catch (err) {
         console.log(err.message);
