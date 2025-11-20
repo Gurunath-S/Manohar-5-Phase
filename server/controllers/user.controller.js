@@ -1,10 +1,10 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const bcrypt=require('bcryptjs')
 
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const { phone, password, role, access } = req.body;
+  const accessData = Array.isArray(access) ? access[0] : access;
 
   try {
     if (isNaN(id)) {
@@ -21,10 +21,10 @@ exports.updateUser = async (req, res) => {
         .status(404)
         .json({ message: "User not found in the database" });
     }
-    let hashedPassword = existingUser.hashPassword;
+    let hashPassword = existingUser.hashPassword;
     if (password) {
       const salt = await bcrypt.genSalt(10);
-      hashedPassword = await bcrypt.hash(password, salt);
+      hashPassword = await bcrypt.hash(password, salt);
     }
 
     const updatedUser = await prisma.user.update({
@@ -32,12 +32,12 @@ exports.updateUser = async (req, res) => {
       data: {
         phone: phone ?? existingUser.phone,
         password: password ?? existingUser.password,
-        hashPassword:hashedPassword,
+        hashPassword,
         role: role ?? existingUser.role,
         access: {
           update: {
             where: {
-              id: access.id,
+              id: accessData.id,
             },
             data: {
               userCreateAccess: access?.userCreateAccess || false,
@@ -100,9 +100,6 @@ exports.getAllUser=async(req,res)=>{
          const allCustomers=await prisma.user.findMany({
           orderBy:{
             id:"desc"
-          },
-          include:{
-            access:true
           }
          })
          return res.status(200).json({success:true,allCustomers})
