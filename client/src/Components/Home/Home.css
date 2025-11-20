@@ -1,0 +1,48 @@
+body{
+    background-image: url('https://plus.unsplash.com/premium_photo-1701534008693-0eee0632d47a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8d2Vic2l0ZSUyMGJhY2tncm91bmR8ZW58MHx8MHx8fDA%3D');
+    background-size: cover;
+    background-repeat: repeat;  
+    height: 100%;
+    min-height: 100vh;
+    width: 100%;
+}
+.home-root{
+   margin-top: 4rem;
+}
+
+.lot{
+   display: flex;
+   gap: 2rem;
+   align-items: center;
+   justify-content: center;
+   align-content: center;
+   margin-top: 25rem;
+}
+.plain-lot{
+   color: white;
+   font-size: 1.5rem;
+   background-color: blueviolet;
+   width: 10rem;
+   height: 10rem;
+   text-align: center;
+   /* padding:5rem; */
+   cursor: pointer;
+   border-radius: 2rem;
+}
+.beadsenamel-lot{
+   color: white;
+   font-size: 1.5rem;
+   background-color: blue;
+   /* text-align: center; */
+   width: 10rem;
+   height: 10rem;
+   padding: 10rem;
+   cursor: pointer;
+   border-radius: 2rem;
+   transition: all 2 ease;
+}
+
+.lot:hover{
+    color: aqua;
+    /* transform: rotate(350deg); */
+}
