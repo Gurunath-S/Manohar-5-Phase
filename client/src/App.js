@@ -6,11 +6,16 @@ import Billing from './Components/Billing/Billing'
 import AddBilling from "./Components/AddBilling/AddBilling";
 import AddNewRestore from "./Components/AddRestore/AddRestore";
 import BarcodePage from "./Components/BarcodePage/BarcodePage";
-import Home from "./Components/Home/Home";
+import Beadsenamel from "./Components/AddLot/Beadsenamel";
+import PlainLot from "./Components/AddLot/PlainLot";
 import Navbarr from "./Components/Navbarr/Navbarr";
 import Login from "./Components/Login/Login";
 import Restore from "./Components/Restore/Restore";
 import ViewRestore from "./Components/ViewRestore/ViewRestore";
+import AdminUsers from "./Components/Master/Admin/AdminUsers";
+import AddGoldsmith from "./Components/Master/AddGoldsmith/AddGoldsmith";
+import AddItem from "./Components/Master/AddItem/AddItem";
+import Home from "./Components/Home/Home";
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -24,7 +29,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="navbarr" element={<Navbarr />} />
-
+          <Route path="/admin" element={<AdminUsers />} />
           <Route
             path="/products/:lot_id"
             element={
@@ -44,7 +49,12 @@ function App() {
             />
           }
         /> */}
-          <Route path="/home" element={<Home />} />
+         
+          <Route path="/home" element={<Home/>} />
+          <Route path="/additem" element={<AddItem />} />
+          <Route path="/addgoldsmith" element={<AddGoldsmith />} />
+          <Route path="/beadsenamellot" element={<Beadsenamel />} />
+          <Route path="/plainlot" element={<PlainLot />} />
           <Route path="/" element={<Login />} />
 
           <Route path="/products/:id" element={<Products />} />
@@ -81,10 +91,3 @@ function App() {
 }
 
 export default App;
-
-
-   
- 
-
- 
-
