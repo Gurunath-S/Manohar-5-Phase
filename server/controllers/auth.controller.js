@@ -25,18 +25,19 @@ exports.userRegister=async(req,res)=>{
             password:password||"",
             hashPassword,
             phone:phone||"",
-            role:role||"user",
+            role:role||"",
             access:{
                 create:{
                       userCreateAccess :access?.userCreateAccess||false,
-                      goldSmithAccess  :access?.goldSmithAccess||true,
-                      itemAccess       :access?.itemAccess||true,
-                      productAccess    :access?.productAccess||true,
-                      billingAccess    :access?.billingAccess||true,
+                      goldSmithAccess  :access?.goldSmithAccess||false,
+                      itemAccess       :access?.itemAccess||false,
+                      productAccess    :access?.productAccess||false,
+                      billingAccess    :access?.billingAccess,
                       restoreAccess    :access?.restoreAccess||false    
                 }
             }
-          }
+            
+        }
        })
        return res.status(201).json({suceess:true,message:"User Created SuccessFully",newUser})
     }
