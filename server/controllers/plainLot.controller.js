@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+// create Plain lot
 exports.createPlainLot = async (req, res) => {
   const { lotId } = req.body;
   try {
@@ -32,7 +33,7 @@ exports.createPlainLot = async (req, res) => {
   }
 };
 
-
+// get particular lot info by Lot Id
 exports.getPlainLotById = async (req, res) => {
   const { id } = req.params;
 
@@ -64,9 +65,10 @@ exports.getPlainLotById = async (req, res) => {
 };
 
 
-
+// get All available lots information
 exports.getAllLot = async (req, res) => {
   try {
+
     const allPlainLot = await prisma.plainLot.findMany({
       where: {
         isAvailable:true,
@@ -81,6 +83,8 @@ exports.getAllLot = async (req, res) => {
   }
 };
 
+
+// changeToDiactivate stage
 exports.change_To_Diactivate = async (req, res) => {
   const { id } = req.params;
   try {
@@ -111,7 +115,7 @@ exports.change_To_Diactivate = async (req, res) => {
   }
 };
 
-
+// get All deleted lots
 exports.get_Diactivate_Lots=async(req,res)=>{
     try{
 
@@ -128,7 +132,7 @@ exports.get_Diactivate_Lots=async(req,res)=>{
     }
 }
 
-
+// changeToactivate stage
 exports.activateLot=async(req,res)=>{
      
       const {id}=req.params
@@ -159,6 +163,7 @@ exports.activateLot=async(req,res)=>{
       }
 }
 
+// delete lot 
 
 exports.deletePlainLot=async(req,res)=>{
         const {id}=req.params

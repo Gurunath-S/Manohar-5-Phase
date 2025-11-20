@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 // create new lot
 const postLotInfo = async (req, res, error) => {
-  console.log("data", req.body);
+
   try {
     const {
       lot_name,
@@ -50,7 +50,7 @@ const postLotInfo = async (req, res, error) => {
 
 const getAllLots = async (req, res, next) => {
   try {
-    const lots = await prisma.lot_info.findMany();
+    const lots = await prisma.lot_info.findMany({where:{isAvailable:true}});
     if (lots) {
       return res
         .status(200)
@@ -116,6 +116,87 @@ const getLotById = async (req, res, next) => {
     return next(error);
   }
 };
+ 
+// getDiactivateLots
+
+const getDiactivateLots = async (req, res, next) => {
+  try {
+    const lots = await prisma.lot_info.findMany({where:{isAvailable:false}});
+    if (lots) {
+      return res
+        .status(200)
+        .json({ msg: "successfully fetched Diactivated lots", result: lots });
+    } else {
+      return res.status(400).json({ msg: "failed to fetch lots" });
+    }
+  } catch (error) {
+    console.log(error);
+    return next(error);
+  }
+};
+
+// changeToActivateLot
+const changeToActivateLot=async(req,res)=>{
+     const {id}=req.params
+
+     try{
+        if(isNaN(id)) return res.status(400).json({message:"Invalid Id"})
+         
+        const existingLot=await prisma.lot_info.findUnique({where:{id:parseInt(id)}})
+        if(existingLot){
+           
+          const lotInfo=await prisma.lot_info.update({
+            where:{
+              id:parseInt(id)
+            },
+            data:{
+              isAvailable:true
+            }
+          })
+          return res.status(200).json({success:true,message:"change to Activate",lotInfo})
+        }else{
+          return res.status(400).json({message:"Lot Not Found In Db"})
+        }
+        
+     }
+      catch(err){
+       console.log('err',err.message)
+       return res.status(500).json({err:err.message})
+     }
+}
+
+
+
+// changeToDiactivateLot
+
+const changeToDiactivateLot=async(req,res)=>{
+     const {id}=req.params
+
+     try{
+        if(isNaN(id)) return res.status(400).json({message:"Invalid Id"})
+         
+        const existingLot=await prisma.lot_info.findUnique({where:{id:parseInt(id)}})
+        if(existingLot){
+           
+          const lotInfo=await prisma.lot_info.update({
+            where:{
+              id:parseInt(id)
+            },
+            data:{
+              isAvailable:false
+            }
+          })
+          return res.status(200).json({success:true,message:"change to Diactivate",lotInfo})
+        }else{
+          return res.status(400).json({message:"Lot Not Found In Db"})
+        }
+        
+     }
+      catch(err){
+       console.log('err',err.message)
+       return res.status(500).json({err:err.message})
+     }
+}
 
 // delete a lot by id
 
@@ -196,4 +277,7 @@ module.exports = {
   getLotById,
   deleteLot,
   updateLotData,
+  changeToDiactivateLot,
+  changeToActivateLot,
+  getDiactivateLots
 };
