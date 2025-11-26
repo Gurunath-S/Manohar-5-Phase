@@ -100,10 +100,25 @@ exports.deleteMasterItem=async(req,res)=>{
 }
 
 exports.getAllMasterItem=async(req,res)=>{
+    
+      const page=req.query.page
+      const limit=req.query.limit
+
+      const skip=(page-1) * limit
+
      try{
-       const allMasterItem=await prisma.masterItems.findMany()
+       const allMasterItem=await prisma.masterItems.findMany({
+          skip:parseInt(skip),
+          take:parseInt(limit),
+          orderBy:{
+            id:"desc"
+          }
+       })
+       const totalCount = await prisma.masterItems.count();
 
        return res.status(200).json({
+        totalCount,
+        totalPage:Math.ceil(totalCount/limit),
         success:true,
         allMasterItem
       })

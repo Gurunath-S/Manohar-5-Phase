@@ -50,12 +50,34 @@ const postLotInfo = async (req, res, error) => {
 
 const getAllLots = async (req, res, next) => {
   try {
-    const lots = await prisma.lot_info.findMany({where:{isAvailable:true}});
+     const page=req.query.page||1
+     const limit=req.query.limit||10
+
+     const skip=(page-1) * limit
+
+    const lots = await prisma.lot_info.findMany({
+      where:{
+        isAvailable:true
+      },
+      skip:parseInt(skip),
+      take:parseInt(limit),
+      orderBy:{
+        id:"desc"
+      }
+    });
+     const totalCount = await prisma.lot_info.count({
+        where: { isAvailable: true },
+      });
+
     if (lots) {
      
       return res
         .status(200)
-        .json({ msg: "successfully fetched", result: lots });
+        .json({ 
+          totalCount,
+          totalPage:Math.ceil(totalCount/limit),
+          msg: "successfully fetched", 
+          result: lots });
     } else {
       return res.status(400).json({ msg: "failed to fetch lots" });
     }
