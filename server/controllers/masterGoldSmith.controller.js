@@ -112,10 +112,26 @@ exports.deleteGoldSmithById=async(req,res)=>{
  }
 
 exports.getAllGoldSmith=async(req,res)=>{
-      try{
-       const allGoldSmith=await prisma.masterGoldSmith.findMany()
+      const page=req.query.page
+      const limit=req.query.limit
+      const skip=(page-1) * limit
 
+
+
+      try{
+       const allGoldSmith=await prisma.masterGoldSmith.findMany({
+          
+          skip:parseInt(skip),
+          take:parseInt(limit),
+          orderBy:{
+            id:"desc"
+          }
+       })
+      const totalCount = await prisma.masterGoldSmith.count();
+       
        return res.status(200).json({
+        totalCount,
+        totalPage:Math.ceil(totalCount/limit),
         success:true,
         allGoldSmith
       })

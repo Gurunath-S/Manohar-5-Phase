@@ -71,15 +71,32 @@ exports.getPlainLotById = async (req, res) => {
 // get All available lots information
 exports.getAllLot = async (req, res) => {
   try {
+    const page=req.query.page||1
+    const limit=req.query.limit||1
+    const skip=(page-1) * limit;
+
 
     const allPlainLot = await prisma.plainLot.findMany({
+      
       where: {
         isAvailable:true,
       },
+      skip:parseInt(skip),
+      take:parseInt(limit),
+      orderBy:{
+        id:"desc"
+      }
     });
+   const totalCount = await prisma.plainLot.count({
+      where: { isAvailable: true },
+    });
+
     return res
       .status(200)
-      .json({ allPlainLot, message: "Fetched All Plain Lots", success: true });
+      .json({ 
+        totalCount,
+        totalPage:Math.ceil(totalCount/limit),
+        allPlainLot, message: "Fetched All Plain Lots", success: true });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: err.message });
