@@ -21,11 +21,6 @@ import ReactDOMServer from "react-dom/server";
 import { handleWeight } from "../utils";
 import Products from "./Products";
 
-
-
-
-
-
 const AddProduct=({
     showAddItemsPopup,
     closeAddItemsPopup,
@@ -68,10 +63,26 @@ const AddProduct=({
       fieldName:""
     }
   )
+const handleWeightData=async()=>{
+      try{
+        const weight = await handleWeight(); 
+        console.log(weight.weightdata);
+
+        if(weight.weightdata!==null && weight.weightdata!==undefined){
+            setBeforeWeight(weight.weightdata);
+       }
+
+      }catch(err){
+         console.log(err.message)
+        
+      }
+  }
 
   const toggleWebcam = (field) => {
     setWebcamVisible((prev) => !prev);
     setCurrentField(field);
+    
+
   };
   const base64ToFile = (base64Data, filename, mimeType) => {
     const byteCharacters = atob(base64Data.split(",")[1]);
@@ -85,6 +96,9 @@ const AddProduct=({
     const byteArray = new Uint8Array(byteArrays);
     return new File([byteArray], filename, { type: mimeType });
   };
+  
+   
+   
   const createNewProduct=async()=>{
     try {
       const formData=new FormData()
@@ -109,26 +123,27 @@ const AddProduct=({
       );
     
 
-        const uploadedImage = response.data.productImage;
-          console.log("Uploaded image data:", uploadedImage);
+        // const uploadedImage = response.data.productImage;
+        //   console.log("Uploaded image data:", uploadedImage);
     
-          if (uploadedImage && uploadedImage[imgField.fieldName]) {
+        //   if (uploadedImage && uploadedImage[imgField.fieldName]) {
     
-            const imageUrl = `${REACT_APP_BACKEND_SERVER_URL}/uploads/${uploadedImage[0].before_weight_img}`;
+        //     const imageUrl = `${REACT_APP_BACKEND_SERVER_URL}/uploads/${uploadedImage[0].before_weight_img}`;
     
-            console.log(`Image URL: ${imageUrl}`);
-            setCapturedImages((prev) => ({
-              ...prev,
-              [imgField.fieldName]: imageUrl,
-            }));
+        //     console.log(`Image URL: ${imageUrl}`);
+        //     setCapturedImages((prev) => ({
+        //       ...prev,
+        //       [imgField.fieldName]: imageUrl,
+        //     }));
          
-          } else {
-            console.error("Image URL is not found for the given field.");
-          }
+        //   } else {
+        //     console.error("Image URL is not found for the given field.");
+        //   }
       setProducts((prevProducts) => [
           ...prevProducts,
           response.data.newProduct,
         ]);
+        
        closeAddItemsPopup()
        toast.success(response.data.message,{autoClose:2000})
   
@@ -145,19 +160,7 @@ const AddProduct=({
       //  if(weight.weightdata!==null && weight.weightdata!==undefined){
       
     
-      //   switch (fieldName) {
-      //     case "before_weight_img":
-      //         setBeforeWeight(weight.weightdata);
-      //         break;
-      //     case "after_weight_img":
-      //         setAfterWeight(weight.weightdata);
-      //         break;
-      //     case "final_weight_img":
-      //         setFinalWeight(weight.weightdata);
-      //         break;
-      //     default:
-      //         console.warn("Invalid field:", fieldName);
-      // }
+    
         try {
           const formData = new FormData();
           formData.append("image", image);
@@ -216,6 +219,7 @@ const AddProduct=({
   
       const image = canvas.toDataURL("image/jpeg", 1.0); 
       const file = base64ToFile(image, "captured-image.jpg", "image/jpeg");
+      handleWeightData()    
       setImgField({image:image,fieldName:file})
  
       
@@ -297,6 +301,8 @@ const AddProduct=({
                                          onChange={(e) => setBeforeWeight(e.target.value)}
                                        placeholder="Enter Before Weight"
                                        />
+                           
+
 
           <div style={{ display: "flex", alignItems: "center", marginLeft: "8px" }}>
         {capturedImages.before_weight_img && (
@@ -326,6 +332,7 @@ const AddProduct=({
         </Link>
       </div>
     </div>
+   
     <div>
       {beforeWeightPreview && (
         <div className="preview-container">
@@ -345,6 +352,7 @@ const AddProduct=({
         </div>
       )}
     </div>
+         
   </div>
 
   {/* Save Button */}

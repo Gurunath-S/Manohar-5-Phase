@@ -86,7 +86,7 @@ const uploadImage = async (req, res) => {
       }
 
       const updatedProduct = await prisma.product_images.update({
-        where: { id: productImage.id },
+        where: { id: productImage.id},
         data: {
           [fieldName]: req.file.filename,
         },
