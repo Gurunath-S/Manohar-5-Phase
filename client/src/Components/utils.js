@@ -1,4 +1,7 @@
 import axios from "axios"
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export const transform_text = (num)=>{
     return num.split("__")[0]
 }
@@ -9,7 +12,8 @@ export const handleWeight = async () => {
       const res = await axios.get('http://localhost:5000/api/v1/weight/getWeight');
       return res.data;  // Ensure the function returns the weight data
     } catch (err) {
-      alert("weight mechine not Connected ")
+      toast.warn("weight mechine not Connected",{autoClose:2000})
+      // alert("weight mechine not Connected ")
       // console.log(err.message);
       return null;  // Return null if there's an error
     }

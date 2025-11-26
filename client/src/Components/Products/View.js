@@ -1522,13 +1522,13 @@ const handleSave = async () => {
 
       if (uploadedImage && uploadedImage[fieldName]) {
 
-        const imageUrl = `${REACT_APP_BACKEND_SERVER_URL}/uploads/${uploadedImage[0].before_weight_img}`;
+        // const imageUrl = `${REACT_APP_BACKEND_SERVER_URL}/uploads/${uploadedImage[0].before_weight_img}`;
 
-        console.log(`Image URL: ${imageUrl}`);
-        setCapturedImages((prev) => ({
-          ...prev,
-          [fieldName]: imageUrl,
-        }));
+        // console.log(`Image URL: ${imageUrl}`);
+        // setCapturedImages((prev) => ({
+        //   ...prev,
+        //   [fieldName]: imageUrl,
+        // }));
 
         try {
           const weight = await handleWeight();  // Await the function call and Weight Api
