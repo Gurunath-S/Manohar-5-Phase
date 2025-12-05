@@ -1,0 +1,386 @@
+/* ===========================================
+   PAGE BACKGROUND (Same as Home & Lot Pages)
+=========================================== */
+.background {
+  min-height: 100vh;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      #eef3fa,
+      #eef3fa 40px,
+      #e7edf7 40px,
+      #e7edf7 80px
+    );
+  padding-top: 120px;
+  position: relative;
+}
+
+/* ===========================================
+   PAGE TITLE ANIMATION (Fade Down)
+=========================================== */
+.list {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #1A2A47;
+  margin-bottom: 20px;
+  text-align: center;
+  animation: fadeInDown 0.8s ease;
+}
+
+/* ===========================================
+   TABLE CONTAINER CARD
+=========================================== */
+.table-container {
+  background: #ffffff;
+  width: 95%;
+  margin: 0 auto;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeInUp 0.9s ease;
+}
+
+/* ===========================================
+   TABLE STYLING (Premium)
+=========================================== */
+.tab {
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0 10px !important;
+}
+
+/* TABLE HEADER */
+.tab thead th {
+  background: #1A2A47;
+  color: white !important;
+  padding: 12px;
+  text-align: center;
+  border: none !important;
+  font-size: 0.95rem;
+}
+
+/* TABLE ROW */
+.tab tbody tr {
+  background: #f7fbff;
+  border-radius: 12px;
+  transition: 0.25s ease;
+}
+
+/* Rounded corner fix for table rows */
+.tab tbody tr td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+.tab tbody tr td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Hover animation */
+.tab tbody tr:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.10);
+}
+
+/* TABLE CELL */
+.tab tbody td {
+  padding: 14px;
+  text-align: center;
+  border: none !important;
+}
+
+/* TABLE INPUTS */
+.tab input {
+  background: transparent;
+  border: none;
+  width: 90%;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1A2A47;
+}
+
+/* FOOTER TOTALS */
+tfoot tr td {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #1A2A47;
+  border: none !important;
+  padding-top: 12px;
+}
+
+/* ===========================================
+   ACTION ICONS
+=========================================== */
+.icon svg {
+  transition: 0.2s ease;
+}
+
+.icon svg:hover {
+  color: #1A2A47;
+  transform: scale(1.15);
+}
+
+/* ===========================================
+   ADD ITEMS BUTTON
+=========================================== */
+.plain-add-items {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-left: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.plain-add-items button {
+  background: transparent;
+  color: #1A2A47;
+  border: 2px solid #1A2A47;
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.plain-add-items button:hover {
+  background: #1A2A47;
+  color: white;
+}
+
+/* DROPDOWN */
+.plain-add-items select {
+  height: 1.8rem;
+  border-radius: 8px;
+  border: 1px solid #cfd8e3;
+  background: #fff;
+  padding: 2px 8px;
+  font-size: 0.9rem;
+}
+
+/* ===================================================
+   POPUP OVERLAY (dimmed background)
+=================================================== */
+.plain-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ===================================================
+   MODAL BOX (White premium card)
+=================================================== */
+.plain-modal-box {
+  background: #ffffff;
+  width: min(900px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0px 12px 30px rgba(0,0,0,0.15);
+  animation: scaleIn 0.35s ease;
+}
+
+/* TITLE BAR */
+.plain-modal-box h3 {
+  color: #1A2A47;
+  font-size: 1.4rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Close button */
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #444;
+  transition: 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #1A2A47;
+  transform: scale(1.1);
+}
+
+/* ===================================================
+   INPUT + SELECT STYLING
+=================================================== */
+.plain-modal-box label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1A2A47;
+  margin-top: 10px;
+  display: block;
+}
+
+.modal-input,
+.modal-select {
+  width: 100%;
+  padding: 8px 12px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid #cfd8e3;
+  background: #f7fbff;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
+}
+
+.modal-input:focus,
+.modal-select:focus {
+  outline: none;
+  border-color: #1A2A47;
+  box-shadow: 0px 0px 5px rgba(26,42,71,0.25);
+}
+
+/* Disabled fields (Item Code, GS Code) */
+.modal-input[readonly] {
+  background: #edf2f7;
+}
+
+/* ===================================================
+   BUTTONS
+=================================================== */
+.btn-save,
+.btn-cancel,
+.btn-camera,
+.btn-capture,
+.btn-preview {
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+/* SAVE */
+.btn-save {
+  background: #1A2A47;
+  color: white;
+  border: none;
+}
+
+.btn-save:hover {
+  background: #163057;
+}
+
+/* CANCEL */
+.btn-cancel {
+  background: #ffffff;
+  border: 1px solid #cfd8e3;
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background: #edf2f7;
+}
+
+/* CAMERA BUTTON */
+.btn-camera {
+  border: 1px solid #1A2A47;
+  background: #fff;
+  color: #1A2A47;
+}
+
+.btn-camera:hover {
+  background: #1A2A47;
+  color: white;
+}
+
+/* CAPTURE */
+.btn-capture {
+  background: #244242;
+  color: white;
+  border: none;
+}
+
+.btn-capture:hover {
+  background: #1b3232;
+}
+
+/* PREVIEW */
+.btn-preview {
+  background: #fff;
+  border: 1px solid #666;
+}
+
+.btn-preview:hover {
+  background: #f2f2f2;
+}
+
+/* ===================================================
+   VIDEO PREVIEW
+=================================================== */
+.video-preview {
+  margin-top: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ===================================================
+   ANIMATIONS
+=================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+
+
+/* ===========================================
+   ANIMATIONS
+=========================================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================================
+   RESPONSIVE FIXES
+=========================================== */
+@media (max-width: 768px) {
+  .table-container {
+    padding: 18px;
+  }
+
+  .tab input {
+    font-size: 0.8rem;
+  }
+
+  .tab thead th {
+    font-size: 0.8rem;
+  }
+
+  .icon {
+    margin-left: 0 !important;
+  }
+}
