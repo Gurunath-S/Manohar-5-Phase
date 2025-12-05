@@ -27,7 +27,7 @@ app.use("/bills", billRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/v1/lot", lotRoutes);
-app.use("/api/v1/products", productRoutes_v1);
+app.use("/api/v1/products", productRoutes_v1); // the common route for both products
 app.use("/api/v1/weight",weightRoute)
 app.use("/api/v1/restore",restoreRoutes)
 app.use("/api/v1/goldSmith",goldSmithRoutes)
