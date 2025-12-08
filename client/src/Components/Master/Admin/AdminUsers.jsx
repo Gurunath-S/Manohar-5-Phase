@@ -4,14 +4,29 @@ import { toast } from "react-toastify";
 import { REACT_APP_BACKEND_SERVER_URL } from "../../../config";
 import Navbarr from "../../Navbarr/Navbarr";
 import { ToastContainer } from "react-toastify";
- 
+
 const PAGE_SIZE = 8;
- 
-function isSuperAdmin(role) {
-  if (!role) return false;
-  return role.toLowerCase().includes("super");
+function normalizeRole(role) {
+  return (role || "").toString().trim().toLowerCase();
 }
- 
+
+function isSuperAdmin(role) {
+  const r = normalizeRole(role);
+  return r === "superadmin" || r === "super admin";
+}
+
+function canManageTarget(currentRole, targetRole) {
+  const cur = normalizeRole(currentRole);
+  const tgt = normalizeRole(targetRole);
+
+  if (tgt === "superadmin" || tgt === "super admin") {
+    return cur === "superadmin" || cur === "super admin";
+  }
+
+  return true;
+}
+
+
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
@@ -36,13 +51,13 @@ export default function AdminUsers() {
       deleteLotAccess: false,
     },
   });
- 
+
   const token = localStorage.getItem("token");
- 
+
   useEffect(() => {
     fetchUsers();
   }, []);
- 
+
   async function fetchUsers() {
     setLoading(true);
     try {
@@ -53,7 +68,12 @@ export default function AdminUsers() {
       if (!res.ok) {
         toast.error(data.message || "Failed to fetch users");
       } else {
-        setUsers(data.allCustomers || data.allUsers || data || []);
+        setUsers(
+          (data.allCustomers || data.allUsers || data || []).map(u => ({
+            ...u,
+            role: u.role?.toLowerCase() || "user"
+          }))
+        );
       }
     } catch (err) {
       console.error(err);
@@ -62,7 +82,7 @@ export default function AdminUsers() {
       setLoading(false);
     }
   }
- 
+
   function filteredUsers() {
     if (!searchTerm) return users;
     return users.filter(
@@ -72,18 +92,25 @@ export default function AdminUsers() {
         u.role?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
- 
+
   function pageCount() {
     return Math.max(1, Math.ceil(filteredUsers().length / PAGE_SIZE));
   }
- 
+
   function pagedUsers() {
     const filtered = filteredUsers();
     const start = (page - 1) * PAGE_SIZE;
     return filtered.slice(start, start + PAGE_SIZE);
   }
- 
+
   async function openManage(id) {
+    const target = users.find((x) => x.id === id);
+    const currentRole = localStorage.getItem("userRole");
+
+    if (!canManageTarget(currentRole, target?.role)) {
+      toast.error("Only super admin can edit super admin accounts");
+      return;
+    }
     try {
       const res = await fetch(
         `${REACT_APP_BACKEND_SERVER_URL}/api/v1/user/${id}`,
@@ -102,12 +129,12 @@ export default function AdminUsers() {
       toast.error("Network error");
     }
   }
- 
+
   function closeModal() {
     setSelectedUser(null);
     setShowPassword(false);
   }
- 
+
   function closeAddModal() {
     setShowAddModal(false);
     setNewUser({
@@ -126,7 +153,7 @@ export default function AdminUsers() {
       },
     });
   }
- 
+
   function toggleAccess(field) {
     setSelectedUser((u) => {
       if (!u) return u;
@@ -140,7 +167,7 @@ export default function AdminUsers() {
       };
     });
   }
- 
+
   function toggleNewUserAccess(field) {
     setNewUser((prev) => ({
       ...prev,
@@ -150,13 +177,13 @@ export default function AdminUsers() {
       },
     }));
   }
- 
+
   async function handleAddUser() {
     if (!newUser.userName || !newUser.password) {
       toast.error("Username and password are required");
       return;
     }
- 
+
     try {
       const res = await fetch(
         `${REACT_APP_BACKEND_SERVER_URL}/api/v1/auth/register`,
@@ -182,14 +209,19 @@ export default function AdminUsers() {
       toast.error("Network error while creating user");
     }
   }
- 
+
   async function saveAccess() {
     if (!selectedUser) return;
+    const currentRole = localStorage.getItem("userRole");
+    if (!canManageTarget(currentRole, selectedUser.role)) {
+      toast.error("You are not allowed to update this account");
+      return;
+    }
     const id = selectedUser.id;
     const accessItem = Array.isArray(selectedUser.access)
       ? selectedUser.access[0]
       : selectedUser.access;
- 
+
     if (!accessItem || !accessItem.id) {
       toast.error("Invalid access object from backend");
       return;
@@ -210,12 +242,12 @@ export default function AdminUsers() {
       },
     };
     console.log("update time ", body);
- 
+
     // Add password to body if changed
     if (selectedUser.newPassword && selectedUser.newPassword.trim() !== "") {
       body.password = selectedUser.newPassword;
     }
- 
+
     try {
       const res = await fetch(
         `${REACT_APP_BACKEND_SERVER_URL}/api/v1/user/${id}`,
@@ -245,38 +277,41 @@ export default function AdminUsers() {
       toast.error("Network error while saving");
     }
   }
- 
-  async function handleDelete(u) {
-    const currentUserRole = localStorage.getItem("userRole") || "";
- 
-    if (isSuperAdmin(u.role) && !isSuperAdmin(currentUserRole)) {
-      toast.error("Only super admin can delete super admin accounts");
-      return;
-    }
-    if (!window.confirm(`Delete user "${u.userName}"? This is permanent.`))
-      return;
- 
-    try {
-      const res = await fetch(
-        `${REACT_APP_BACKEND_SERVER_URL}/api/v1/user/${u.id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error(data.message || "Delete failed");
-      } else {
-        toast.success("User deleted");
-        fetchUsers();
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Network error while deleting");
-    }
+
+async function handleDelete(u) {
+  const currentRole = localStorage.getItem("userRole");
+  if (isSuperAdmin(u.role)) {
+    toast.error("Superadmin cannot be deleted");
+    return;
   }
- 
+
+  if (!window.confirm(`Delete user "${u.userName}"? This is permanent.`)) return;
+
+  try {
+    const res = await fetch(
+      `${REACT_APP_BACKEND_SERVER_URL}/api/v1/user/${u.id}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.message || "Delete failed");
+      return;
+    }
+
+    toast.success("User deleted");
+    fetchUsers();
+  } catch (err) {
+    console.error(err);
+    toast.error("Network error while deleting");
+  }
+}
+
+
   return (
     <>
       <Navbarr />
@@ -324,7 +359,7 @@ export default function AdminUsers() {
             <span className="stat-badge">Showing: {pagedUsers().length}</span>
           </div>
         </div>
- 
+
         <div className="table-wrap">
           {loading ? (
             <div className="loader-container">
@@ -378,38 +413,31 @@ export default function AdminUsers() {
                         <span className="password-display">••••••••</span>
                       </td>
                       <td className="actions">
- 
-                            {/* Hide Edit & Delete for SUPERADMIN unless logged-in user is superadmin */}
-                            {!(
-                              isSuperAdmin(u.role) && !isSuperAdmin(currentUserRole)
-                            ) && (
-                              <>
-                                {/* EDIT BUTTON */}
-                                <button
-                                  className="btn-action btn-edit"
-                                  onClick={() => openManage(u.id)}
-                                >
-                                  ✏️ Edit
-                                </button>
- 
-                                {/* DELETE BUTTON */}
-                                <button
-                                  className="btn-action btn-delete"
-                                  onClick={() => handleDelete(u)}
-                                  disabled={isSuperAdmin(u.role)}
-                                >
-                                  🗑️ Delete
-                                </button>
-                              </>
-                            )}
- 
-                          </td>
- 
+                        {/* Hide buttons if the row is a superadmin */}
+                        {!isSuperAdmin(u.role) && (
+                          <>
+                            <button
+                              className="btn-action btn-edit"
+                              onClick={() => openManage(u.id)}
+                            >
+                              ✏️ Edit
+                            </button>
+
+                            <button
+                              className="btn-action btn-delete"
+                              onClick={() => handleDelete(u)}
+                            >
+                              🗑️ Delete
+                            </button>
+                          </>
+                        )}
+
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
- 
+
               {pageCount() > 1 && (
                 <div className="pagination">
                   <button
@@ -436,7 +464,7 @@ export default function AdminUsers() {
             </>
           )}
         </div>
- 
+
         {/* Add User Modal */}
         {showAddModal && (
           <div className="modal-backdrop" onClick={closeAddModal}>
@@ -447,7 +475,7 @@ export default function AdminUsers() {
                   ×
                 </button>
               </div>
- 
+
               <div className="modal-body">
                 <div className="form-group">
                   <label>Username *</label>
@@ -461,7 +489,7 @@ export default function AdminUsers() {
                     className="form-input"
                   />
                 </div>
- 
+
                 <div className="form-group">
                   <label>Phone</label>
                   <input
@@ -474,7 +502,7 @@ export default function AdminUsers() {
                     className="form-input"
                   />
                 </div>
- 
+
                 <div className="form-group">
                   <label>Password *</label>
                   <div className="password-input-wrapper">
@@ -496,7 +524,7 @@ export default function AdminUsers() {
                     </button>
                   </div>
                 </div>
- 
+
                 <div className="form-group">
                   <label>Role</label>
                   <select
@@ -511,7 +539,7 @@ export default function AdminUsers() {
                     {/* <option value="superadmin">Super Admin</option> */}
                   </select>
                 </div>
- 
+
                 <div className="form-group">
                   <label>Access Permissions</label>
                   <div className="access-grid">
@@ -523,7 +551,7 @@ export default function AdminUsers() {
                       />
                       <span>Create Users 👥</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -532,7 +560,7 @@ export default function AdminUsers() {
                       />
                       <span>Products 📦</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -541,7 +569,7 @@ export default function AdminUsers() {
                       />
                       <span>Billing 💰</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -550,7 +578,7 @@ export default function AdminUsers() {
                       />
                       <span>Restore ♻️</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -559,7 +587,7 @@ export default function AdminUsers() {
                       />
                       <span>GoldSmith ⚒️</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -579,7 +607,7 @@ export default function AdminUsers() {
                   </div>
                 </div>
               </div>
- 
+
               <div className="modal-footer">
                 <button className="btn-secondary" onClick={closeAddModal}>
                   Cancel
@@ -591,7 +619,7 @@ export default function AdminUsers() {
             </div>
           </div>
         )}
- 
+
         {/* Edit User Modal */}
         {selectedUser && (
           <div className="modal-backdrop" onClick={closeModal}>
@@ -602,7 +630,7 @@ export default function AdminUsers() {
                   ×
                 </button>
               </div>
- 
+
               <div className="modal-body">
                 <div className="form-group">
                   <label>Phone</label>
@@ -619,7 +647,7 @@ export default function AdminUsers() {
                     className="form-input"
                   />
                 </div>
- 
+
                 <div className="form-group">
                   <label>Current Password</label>
                   <div className="password-display-box">
@@ -637,7 +665,7 @@ export default function AdminUsers() {
                     </button>
                   </div>
                 </div>
- 
+
                 <div className="form-group">
                   <label>New Password (leave empty to keep current)</label>
                   <input
@@ -658,7 +686,7 @@ export default function AdminUsers() {
                     </small>
                   )}
                 </div>
- 
+
                 <div className="form-group">
                   <label>Role</label>
                   <select
@@ -673,7 +701,7 @@ export default function AdminUsers() {
                     {/* <option value="superadmin">Super Admin</option> */}
                   </select>
                 </div>
- 
+
                 <div className="form-group">
                   <label>Access Permissions</label>
                   <div className="access-grid">
@@ -691,7 +719,7 @@ export default function AdminUsers() {
                       />
                       <span>Create Users 👥</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -706,7 +734,7 @@ export default function AdminUsers() {
                       />
                       <span>Products 📦</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -721,7 +749,7 @@ export default function AdminUsers() {
                       />
                       <span>Billing 💰</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -736,7 +764,7 @@ export default function AdminUsers() {
                       />
                       <span>Restore ♻️</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -751,7 +779,7 @@ export default function AdminUsers() {
                       />
                       <span>GoldSmith ⚒️</span>
                     </label>
- 
+
                     <label className="checkbox-label">
                       <input
                         type="checkbox"
@@ -782,7 +810,7 @@ export default function AdminUsers() {
                     </label>
                   </div>
                 </div>
- 
+
                 <div className="info-box">
                   <span className="info-icon">ℹ️</span>
                   <p>
@@ -791,7 +819,7 @@ export default function AdminUsers() {
                   </p>
                 </div>
               </div>
- 
+
               <div className="modal-footer">
                 <button className="btn-secondary" onClick={closeModal}>
                   Cancel
