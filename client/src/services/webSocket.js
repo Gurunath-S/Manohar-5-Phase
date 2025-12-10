@@ -3,7 +3,7 @@ let ws;
 let listeners = [];
 
 function initWebSocket() {
-  ws = new WebSocket("https://94.136.190.133:6020");
+  ws = new WebSocket("wss://94.136.190.133:6020/ws");
 
   ws.onopen = () => console.log("WS Connected");
 
