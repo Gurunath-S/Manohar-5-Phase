@@ -68,10 +68,10 @@ const AddProduct=({
 const handleWeightData=async()=>{
       try{
         const weight = await handleWeight();
-        console.log(weight.weightdata);
+        console.log(weight);
  
-        if(weight.weightdata!==null && weight.weightdata!==undefined){
-            setBeforeWeight(weight.weightdata);
+        if(weight!==null && weight!==undefined){
+            setBeforeWeight(weight);
        }
  
       }catch(err){

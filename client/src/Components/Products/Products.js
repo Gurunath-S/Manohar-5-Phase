@@ -673,10 +673,10 @@ const handleBulkWeight=async(fieldName)=>{
  
          switch (fieldName) {
              case "bulkWeightBefore":
-                 setBulkWeightBefore(weight.weightdata);
+                 setBulkWeightBefore(weight);
                  break;
              case "bulkWeightAfter":
-                setBulkWeightAfter(weight.weightdata);
+                setBulkWeightAfter(weight);
                  break;
             
              default:
