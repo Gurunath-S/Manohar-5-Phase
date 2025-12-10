@@ -6,7 +6,7 @@ const cors = require("cors");
 const port = process.env.PORT||5002;
 const app = express();
 
-const {createProxyMiddleware}=require('http-proxy-middleware')
+
 
 const billRoutes = require("./routes/bills.routes");
 const productRoutes = require("./routes/productInfo.routes");
@@ -38,13 +38,6 @@ app.use("/api/v1/masterItem",masterItem)
 app.use("/api/v1/auth",authRoutes)
 app.use("/api/v1/user",userRoutes)
 app.use("/api/v1/restoreLot",restoreLot)
-
-app.use('/ws',createProxyMiddleware({
-  target:'ws://94.136.190.133:6020',
-  changeOrigin:true,
-  ws:true
-}))
-
 
 app.use(express.static(uploadDir));
 

@@ -3,7 +3,6 @@ import {REACT_APP_BACKEND_SERVER_URL} from "../config/index"
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 export const transform_text = (num) => {
   if (num === undefined || num === null) return "";
   // Force convert to string always
@@ -24,9 +23,9 @@ export const transform_text = (num) => {
 //     }
 //   };
 // this is web socket Port for get weight form this port
-// http://94.136.190.133:6020
 
-const ws = new WebSocket("wss://manohar-5-phase-1.onrender.com/ws");
+
+const ws = new WebSocket("ws://94.136.190.133:6020/ws");
 
 export const handleWeight = () => {
   return new Promise((resolve, reject) => {
