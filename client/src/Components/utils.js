@@ -25,7 +25,7 @@ export const transform_text = (num) => {
 // this is web socket Port for get weight form this port
 
 
-const ws = new WebSocket("ws://94.136.190.133:6020/ws");
+const ws = new WebSocket("wss://94.136.190.133:6020/ws");
 
 export const handleWeight = () => {
   return new Promise((resolve, reject) => {
