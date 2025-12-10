@@ -957,7 +957,7 @@ const handleWeightData=async()=>{
                     });
                   }}
                 />
-                <img src={weightImg} onClick={()=>{setGrossWeight(weight)}} alt="weightImage" width={40} height={40}></img>
+                <img src={weightImg} onClick={()=>{handleWeightData()}} alt="weightImage" width={40} height={40}></img>
               </div>
           
                 <label style={{ marginTop: 8 }}>Stone Weight</label>
