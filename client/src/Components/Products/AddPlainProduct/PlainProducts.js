@@ -389,9 +389,9 @@ const handleBulkExportPdf = async (items) => {
   const handleWeightData=async()=>{
         try{
           const weight = await handleWeight(); 
-          console.log(weight.weightdata);
+          console.log('weight',weight);
   
-          if(weight.weightdata==null && weight.weightdata!==undefined){
+          if(weight==null && weight!==undefined){
               setGrossWeight(weight);
          }
   
