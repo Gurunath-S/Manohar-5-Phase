@@ -17,10 +17,11 @@ import ReactDOMServer from "react-dom/server";
 import manoImage from "../../../Components/Logo/mp.png";
 import { REACT_APP_BACKEND_SERVER_URL } from "../../../config";
 import QRCode from "react-qr-code";
-import { weightVerify, weightVerifyBoth, handleWeight, transform_text } from "../../utils";
+import { weightVerify, weightVerifyBoth,transform_text } from "../../utils";
 import "./PlainProducts.css";
 import weightImg from '../../../assets/weight.png'
 let isGeneratingPdf = false;
+import { subscribeWeight } from "../../../services/webSocket";
 
 const PlainProducts = () => {
   const { lot_id } = useParams(); // assume DB id (plainLot.id)
@@ -61,6 +62,17 @@ const PlainProducts = () => {
   const [deletingId, setDeletingId] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [printing, setPrinting] = useState(false);
+  const [weight, setWeight] = useState(0);
+
+
+
+// get weight using call back function
+  useEffect(() => {
+    const unsubscribe = subscribeWeight((w) => setWeight(w));
+
+    return () => unsubscribe();
+  }, []);
+
 
 
   // fetch lot and products (uses your plainLot endpoint)
@@ -384,23 +396,6 @@ const handleBulkExportPdf = async (items) => {
       }
   };
 
-  // get weight from websocket port
-
-  const handleWeightData=async()=>{
-        try{
-          const weight = await handleWeight(); 
-          console.log('weight',weight);
-  
-          if(weight==null && weight!==undefined){
-              setGrossWeight(weight);
-         }
-  
-        }catch(err){
-           console.log(err.message)
-         
-          
-        }
-    }
 
   // View popup open/close (keeps your old WeightFormPopup usage)
   const openPopup = (id) => {
@@ -828,7 +823,7 @@ const handleBulkExportPdf = async (items) => {
                 <label>Gross Weight</label>
                 <div className="weightImg">
                 <input value={grossWeight} onChange={(e) => setGrossWeight(e.target.value)} style={inputStyle} />
-                <img src={weightImg} onClick={()=>{handleWeightData()}} alt="weightImage" width={40} height={40}></img>
+                <img src={weightImg} onClick={()=>{setGrossWeight(weight)}} alt="weightImage" width={40} height={40}></img>
                 </div>
 
                 <label style={{ marginTop: 8 }}>Stone Weight</label>
