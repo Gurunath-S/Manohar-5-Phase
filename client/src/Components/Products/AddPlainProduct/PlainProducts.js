@@ -1,5 +1,6 @@
 // PlainProducts.jsx
 import React, { useState, useRef, useEffect } from "react";
+import { subscribeWeight } from "../../../services/webSocket";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faTrash, faEye, faCamera } from "@fortawesome/free-solid-svg-icons";
@@ -21,7 +22,7 @@ import { weightVerify, weightVerifyBoth,transform_text } from "../../utils";
 import "./PlainProducts.css";
 import weightImg from '../../../assets/weight.png'
 let isGeneratingPdf = false;
-import { subscribeWeight } from "../../../services/webSocket";
+
 
 const PlainProducts = () => {
   const { lot_id } = useParams(); // assume DB id (plainLot.id)
@@ -940,7 +941,7 @@ const handleBulkExportPdf = async (items) => {
                     });
                   }}
                 />
-                <img src={weightImg} onClick={()=>{handleWeightData()}} alt="weightImage" width={40} height={40}></img>
+                <img src={weightImg} onClick={()=>{setGrossWeight(weight)}} alt="weightImage" width={40} height={40}></img>
               </div>
           
                 <label style={{ marginTop: 8 }}>Stone Weight</label>
