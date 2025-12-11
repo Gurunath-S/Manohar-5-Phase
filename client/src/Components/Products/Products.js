@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +21,7 @@ import manoImage from "../../Components/Logo/mp.png";
 import { REACT_APP_BACKEND_SERVER_URL } from "../../config";
 import { weightVerify,weightVerifyBoth,handleWeight,transform_text } from "../utils";
 let isGeneratingPdf = false;
- 
+
 const Products = () => {
   const { lot_id } = useParams();
   const location = useLocation();
@@ -52,14 +53,14 @@ const Products = () => {
   const navigate = useNavigate();
   const exportPDF = () => {
     const doc = new jsPDF();
-    const imgWidth = 30;
-    const imgHeight = 20;
+    const imgWidth = 30; 
+    const imgHeight = 20; 
     const pageWidth = doc.internal.pageSize.getWidth();
-    const padding = 10;
- 
-    const x = pageWidth - imgWidth - padding;
-    const y = padding;
- 
+    const padding = 10; 
+
+    const x = pageWidth - imgWidth - padding; 
+    const y = padding; 
+
  
     doc.addImage(manoImage, "PNG", x, y, imgWidth, imgHeight,);
      const tableMarginTop = y + imgHeight + 10;
@@ -74,7 +75,7 @@ const Products = () => {
       "Final Weight",
       "Barcode Weight",
     ];
- 
+
     const tableData = products.map((product, index) => [
       index + 1,
       transform_text(product.product_number),
@@ -85,7 +86,7 @@ const Products = () => {
       product.final_weight,
       product.barcode_weight,
     ]);
- 
+
  
     const totalBeforeWeight = filterProducts
       .reduce((acc, product) => acc + parseFloat(product.before_weight || 0), 0)
@@ -108,12 +109,12 @@ const Products = () => {
         0
       )
       .toFixed(3);
- 
+
  
     const bulkWeightDifference = (
       bulkWeightAfter - bulkWeightBefore || 0
     ).toFixed(3);
- 
+
    
     const footerData = [
       [
@@ -128,7 +129,7 @@ const Products = () => {
       ],
       ["", "Bulk Weight Difference:", "", "", bulkWeightDifference, "", "", ""],
     ];
- 
+
    
     doc.autoTable({
       head: [tableHeaders],
@@ -151,11 +152,140 @@ const Products = () => {
         7: { halign: "center" },
       },
     });
- 
- 
+
+
     doc.save("product_details.pdf");
   };
- 
+
+
+
+// const handleBulkExportPdf = async (items) => {
+//   if (isGeneratingPdf) return;
+//   isGeneratingPdf = true;
+
+//   try {
+//     const pdf = new jsPDF({
+//       orientation: "landscape",
+//       unit: "mm",
+//       format: [56, 12],
+//       compress: true,
+//       dpi: 300,
+//     });
+
+//     const scale = 5;
+
+//     for (let i = 0; i < items.length; i++) {
+//       const item = items[i];
+
+//       const tempDiv = document.createElement("div");
+//       tempDiv.style.position = "absolute";
+//       tempDiv.style.top = "-9999px";
+//       tempDiv.style.left = "-9999px";
+//       tempDiv.style.width = "55mm";
+//       tempDiv.style.height = "12mm";
+//       tempDiv.style.display = "flex";
+//       tempDiv.style.flexDirection = "row";
+//       tempDiv.style.backgroundColor = "#fff";
+//       tempDiv.style.border = "1px solid #ccc";
+//       tempDiv.style.boxSizing = "border-box";
+//       tempDiv.style.padding = "2mm";
+
+//       const leftSection = document.createElement("div");
+//       leftSection.style.display = "flex";
+//       leftSection.style.flexDirection = "row";
+//       leftSection.style.alignItems = "center";
+//       leftSection.style.width = "50%";
+//       leftSection.style.marginLeft = "1rem";
+
+//       const qrCodeContainer = document.createElement("div");
+//       qrCodeContainer.style.display = "flex";
+//       qrCodeContainer.style.marginLeft = "1rem";
+//       qrCodeContainer.style.fontWeight = "bold";
+//       qrCodeContainer.style.fontSize = "9px";
+//       qrCodeContainer.style.marginBottom = "2px";
+//       qrCodeContainer.style.width = "2px";
+
+//       const barcodeContainer = document.createElement("div");
+//       qrCodeContainer.appendChild(barcodeContainer);
+
+//       const barcodeSvg = (
+//         <Barcode value={item.product_number} size={30} format="svg" />
+//       );
+//       const svgContainer = ReactDOMServer.renderToStaticMarkup(barcodeSvg);
+//       barcodeContainer.innerHTML = svgContainer;
+
+//       const detailsContainer = document.createElement("div");
+//       detailsContainer.style.display = "flex";
+//       detailsContainer.style.flexDirection = "column";
+
+//       const barcodeWeightText = document.createElement("span");
+//       barcodeWeightText.textContent = ` ${item.barcode_weight}`;
+//       barcodeWeightText.style.fontSize = "11px";
+//       barcodeWeightText.style.fontWeight = "bold";
+//       barcodeWeightText.style.marginLeft = "7px";
+//       detailsContainer.appendChild(barcodeWeightText);
+
+//       const productNumberText = document.createElement("span");
+//       productNumberText.textContent = ` ${transform_text(item.product_number)}`;
+//       productNumberText.style.fontSize = "11px";
+//       productNumberText.style.marginLeft = "4px";
+//       productNumberText.style.fontWeight = "bold";
+//       productNumberText.style.color = "black";
+//       detailsContainer.appendChild(productNumberText);
+
+//       qrCodeContainer.appendChild(detailsContainer);
+//       leftSection.appendChild(qrCodeContainer);
+//       tempDiv.appendChild(leftSection);
+
+//       const rightSection = document.createElement("div");
+//       rightSection.style.display = "flex";
+//       rightSection.style.alignItems = "center";
+//       rightSection.style.justifyContent = "center";
+//       rightSection.style.width = "50%";
+//       rightSection.style.marginLeft = "1rem";
+
+//       const logoImg = document.createElement("img");
+//       logoImg.src = manoImage;
+//       logoImg.alt = "Logo";
+//       logoImg.style.width = "15mm";
+//       logoImg.style.height = "15mm";
+//       logoImg.style.filter = "contrast(170%) brightness(100%)";
+//       logoImg.style.boxShadow = "0px 0px 5px 2px black";
+//       logoImg.style.fontWeight = "bold";
+//       logoImg.style.marginBottom = "7px";
+//       logoImg.style.marginLeft = "4.5mm";
+//       rightSection.appendChild(logoImg);
+//       tempDiv.appendChild(rightSection);
+
+//       document.body.appendChild(tempDiv);
+
+      
+//       const canvas = await html2canvas(tempDiv, {
+//         backgroundColor: null,
+//         scale: scale,
+//       });
+
+//       const imgData = canvas.toDataURL("image/png");
+
+//       pdf.addImage(imgData, "PNG", 0, 0, 56, 12);
+
+//       document.body.removeChild(tempDiv);
+
+//       if (i < items.length - 1) {
+//         pdf.addPage();
+//       }
+//     }
+
+//     const pdfBlob = pdf.output("blob");
+//     const pdfUrl = URL.createObjectURL(pdfBlob);
+//     window.open(pdfUrl, "_blank");
+//   } catch (error) {
+//     console.error("Error exporting barcodes as PDF:", error);
+//   } finally {
+//     isGeneratingPdf = false;
+//   }
+// };
+
 const handleBulkExportPdf = async (items) => {
   if (isGeneratingPdf) return;
   isGeneratingPdf = true;
@@ -307,10 +437,10 @@ const handleKeyDown = (e, nextField) => {
         const response = await axios.get(
           `${REACT_APP_BACKEND_SERVER_URL}/api/v1/lot/${lot_id}`
         );
- 
+
         const lot = response.data.lotInfo?.[0];
         console.log("Fetched Lot Data:", lot);
- 
+
         if (lot) {
           setBulkWeightBefore(lot.bulk_weight_before || "");
           setBulkWeightAfter(lot.bulk_after_weight || "");
@@ -319,15 +449,15 @@ const handleKeyDown = (e, nextField) => {
         console.error("Failed to fetch lot details:", error);
       }
     };
- 
+
     fetchLotDetails();
   }, [lot_id]);
- 
- 
+
+
   const handleAddItems = () => {
     setShowAddItemsPopup(true);
   };
- 
+
   const openPopup = (id) => {
     console.log("Open popup pppppppppp",id)
     setShowPopup({ id });
@@ -342,15 +472,15 @@ const handleKeyDown = (e, nextField) => {
   const closeAddItemsPopup = () => {
     setShowAddItemsPopup(false);
   };
- 
- 
+
+
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         const response = await axios.delete(
           `${REACT_APP_BACKEND_SERVER_URL}/api/v1/products/delete/${productId}`
         );
- 
+
         if (response.status === 200) {
           setProducts((prevProducts) =>
             prevProducts.filter((product) => product.id !== productId)
@@ -366,7 +496,7 @@ const handleKeyDown = (e, nextField) => {
       }
     }
   };
- 
+
   const handleUpdateWeights = async () => {
  
     console.log(bulkWeightAfter,bulkWeightBefore,"oooooooooooo")
@@ -375,7 +505,7 @@ const handleKeyDown = (e, nextField) => {
       bulk_weight_before: parseFloat(bulkWeightBefore),
       bulk_after_weight: parseFloat(bulkWeightAfter),
     };
- 
+
     try {
       const response = await axios.post(
         `${REACT_APP_BACKEND_SERVER_URL}/api/v1/lot/modify_lot`,
@@ -383,9 +513,9 @@ const handleKeyDown = (e, nextField) => {
       );
  
       if (response.status === 200) {
- 
+
         console.log("dataaa", response.data.result);
- 
+
         const value = response.data.result;
         setBulkWeightAfter(value.bulk_after_weight);
         setBulkWeightBefore(value.bulk_weight_before);
@@ -408,11 +538,11 @@ const handleKeyDown = (e, nextField) => {
       console.error("Failed to fetch products:", error);
     }
   };
- 
+
   useEffect(() => {
     fetchProducts();
   }, [lot_id]);
- 
+
   const handleCalculate = async () => {
     if (!bulkWeightBefore || !bulkWeightAfter) {
       alert("Please enter both Bulk Weight Before and Bulk Weight After.");
@@ -444,22 +574,22 @@ const handleKeyDown = (e, nextField) => {
       console.error("Error calculating adjustments:", error);
       toast.error("There was an error calculating the adjustments.");
     }
- 
+
     }
     
   };
  
   // const handleSave = async () => {
- 
+
   //   // if (!beforeWeight || !afterWeight || !productNumber || !difference || !adjustment || !finalWeight) {
   //     if (!beforeWeight && !afterWeight && !productNumber && !productWeight) {
   //     alert("Please fill in all the required fields before saving.");
   //     return;
   //   }
- 
- 
+
+
   
- 
+
   //   try {
   //     const payload = {
   //       tag_number: lotNumber,
@@ -467,18 +597,18 @@ const handleKeyDown = (e, nextField) => {
   //       after_weight: afterWeight || null,
   //       barcode_weight: productWeight || null,
   //       difference: difference || null,  
-  //       adjustment: adjustment || null,
+  //       adjustment: adjustment || null, 
   //       final_weight: finalWeight || null,  
   //       product_number: productNumber || null,  
     
   //       lot_id: Number(lot_id),
   //     };
- 
+
   //     const response = await axios.post(
   //       `${REACT_APP_BACKEND_SERVER_URL}/api/v1/products/create`,
   //       payload
   //     );
- 
+
   //     if (response.status === 200) {
   //       setProducts((prevProducts) => [
   //         ...prevProducts,
@@ -497,10 +627,10 @@ const handleKeyDown = (e, nextField) => {
   //     alert("There was an error saving the product.");
   //   }
   // };
- 
- 
- 
- 
+
+
+
+
   const filterProducts = products.filter((item) => {
     if (filterOpt === "all") {
       return true;
@@ -508,20 +638,27 @@ const handleKeyDown = (e, nextField) => {
       return item.product_type === "active";
     } else if (filterOpt === "sold") {
       return item.product_type === "sold";
-    }
+    } 
   });
- 
- 
+
+
   
- 
+
  
   const totalBeforeWeight = filterProducts.reduce((acc, product) => acc + parseFloat(product.before_weight || 0), 0).toFixed(3);
   const totalAfterWeight = filterProducts.reduce((acc, product) => acc + parseFloat(product.after_weight || 0), 0).toFixed(3);
   const totalDifference = filterProducts.reduce((acc, product) => acc + parseFloat(product.difference || 0), 0).toFixed(3);
   const totalAdjustment = filterProducts.reduce((acc, product) => acc + parseFloat(product.adjustment || 0), 0).toFixed(3);
   const totalFinalWeight = filterProducts.reduce((acc, product) => acc + parseFloat(product.final_weight || 0), 0).toFixed(3);
-  const totalBarcodeWeight = filterProducts.reduce((acc, product) => acc + parseFloat(product.barcode_weight || 0), 0).toFixed(3);
- 
+ const totalBarcodeWeight = filterProducts.reduce((acc, product) => {
+    const weight = parseFloat(product?.barcode_weight);
+    // if weight is NaN, treat as 0
+   return acc + (isNaN(weight) ? 0 : weight);
+}, 0).toFixed(3);
+
+console.log("totalFinalWeight", totalBarcodeWeight);
+
+  
 useEffect(() => {
   const handleBarcodeScan = (e) => {
     setShowBarcode((prevData) => prevData + e.key);
@@ -539,27 +676,28 @@ useEffect(() => {
 const handleBulkWeight=async(fieldName)=>{
   try {
          const weight = await handleWeight();  // Await the function call and Weight Api
-         console.log('ETETETETEWTWYT',weight.weightdata);
+         console.log('ETETETETEWTWYT',weight);
  
          switch (fieldName) {
              case "bulkWeightBefore":
-                 setBulkWeightBefore(weight.weightdata);
+                 setBulkWeightBefore(weight);
                  break;
              case "bulkWeightAfter":
-                setBulkWeightAfter(weight.weightdata);
+                setBulkWeightAfter(weight);
                  break;
             
              default:
                  console.warn("Invalid field:", fieldName);
          }
      } catch (err) {
+        
          console.error("Error fetching weight:", err);
      }
 }
- 
+
 const handleVerify=(value)=>{
- 
-value==="Before" ?
+
+value==="Before" ? 
 weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
 :weightVerify("After",bulkWeightAfter,totalAfterWeight)
 }
@@ -584,7 +722,7 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
             <option value="sold">Sold</option>
           </select>
         </div>
- 
+
         <div className="weight">
           <div className="cont">
             <label>Bulk Weight Before: </label>
@@ -649,54 +787,21 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
                 {filterProducts.map((product, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
+                    <td>{transform_text(product.product_number)}</td>
+                    <td>{product.before_weight || ""}</td>
+                    <td>{product.after_weight || ""}</td>
+                    <td>{product.difference?.toFixed(2) || ""}</td>
+                    <td>{product.adjustment?.toFixed(2) || ""}</td>
+                    <td>{product.final_weight?.toFixed(3) || ""}</td>
                     <td>
-                      <input
-                        value={transform_text(product.product_number)}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <input value={product.before_weight || ""} readOnly />
-                    </td>
-                    <td>
-                      <input value={product.after_weight || ""} readOnly />
-                    </td>
-                    <td>
-                      <input
-                        value={product.difference?.toFixed(2) || ""}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <input
-                        value={product.adjustment?.toFixed(2) || ""}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <input
-                       value={product.final_weight?.toFixed(3) || ""}
-                       readOnly
-                      
-                      />
-                    </td>
-                    <td>
-                      <input
-                       
-                       value={
+                      {
                         product.barcode_weight === "null"
                           ? ""
-                          : product.barcode_weight || ""
+                          :Number( product.barcode_weight).toFixed(3) || ""
                       }
-                      readOnly
-                      />
                     </td>
-                    <td>
-                      <input
-                        style={{ fontSize: "0.95rem" }}
-                        value={product.product_type || ""}
-                        readOnly
-                      />
+                    <td  style={{ fontSize: "0.95rem" }}>
+                       {product.product_type || ""}
                     </td>
                     <td>
                       <div className="stone-icon">
@@ -760,47 +865,25 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
                 <label>Bulk Weight Difference:</label>
                 <input value={(bulkWeightAfter - bulkWeightBefore).toFixed(3) || "-"} readOnly />
               </div>
- 
+
               <div className="diffCont">
                 <label>Before Bulk Weight Difference:</label>
                 <input value={(bulkWeightBefore-totalBeforeWeight).toFixed(3) || "-"} readOnly />
               </div>
- 
+
               <div className="diffCont">
                 <label>After Bulk Weight Difference:</label>
                 <input value={(bulkWeightAfter-totalAfterWeight).toFixed(3)|| "-"} readOnly />
               </div>
               <button
-          style={{
-            marginTop: "2rem",
-            marginBottom: "2rem",
-            marginLeft: "4rem",
-            height: "2rem",
-            width: "8rem",
-            fontWeight: "bold",
-            fontSize: "1rem",
-            borderRadius: "5px",
-            backgroundColor: "rgb(36, 36, 66)",
-            color: "white",
-          }}
-          onClick={exportPDF}
+              className="exportPdfBtn"
+               onClick={exportPDF}
         >
           Export as PDF{" "}
         </button>
         <button
           onClick={() => handleBulkExportPdf(products)}
-          style={{
-            marginTop: "2rem",
-            marginBottom: "2rem",
-            marginLeft: "4rem",
-            height: "2rem",
-            width: "8rem",
-            fontWeight: "bold",
-            fontSize: "1rem",
-            borderRadius: "5px",
-            backgroundColor: "rgb(36, 36, 66)",
-            color: "white",
-          }}
+          className="printAllBtn"
         >
           Print All
         </button>
@@ -821,3 +904,4 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
   );
 };
 export default Products;
+
