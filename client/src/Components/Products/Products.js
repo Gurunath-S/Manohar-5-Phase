@@ -877,13 +877,12 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
               </div>
               <button
               className="exportPdfBtn"
-          style={{
-           
-          }}
+        
           onClick={exportPDF}
         >
           Export as PDF{" "}
         </button>
+
         <button
           onClick={() => handleBulkExportPdf(products)}
           className="printAllBtn"

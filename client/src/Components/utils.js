@@ -36,6 +36,7 @@ export const handleWeight = () => {
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log('weight Data',data)
       resolve(data.weight);
     };
 
