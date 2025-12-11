@@ -21,7 +21,7 @@ import axios from "axios";
 import "./PlainLot.css";
 import Navbarr from "../Navbarr/Navbarr";
 import { REACT_APP_BACKEND_SERVER_URL } from "../../config";
-
+ 
 const RoundedTextField = styled(TextField)({
   maxWidth: 300,
   backgroundColor: "#f7fbff",
@@ -45,8 +45,8 @@ const RoundedTextField = styled(TextField)({
     opacity: 1,
   },
 });
-
-
+ 
+ 
 const StyledCard = styled(Card)({
   backgroundColor: "#ffffff",
   borderRadius: "18px",
@@ -57,21 +57,21 @@ const StyledCard = styled(Card)({
   opacity: 0,
   animation: "fadeInUp 0.8s ease both",
   border: "none", // removed outer line
-
+ 
   "&:hover": {
     transform: "translateY(-10px)",
     boxShadow: "0px 12px 26px rgba(0, 0, 0, 0.15)",
   }
 });
-
-
-
+ 
+ 
+ 
 const StyledButton = styled(Button)({
   borderRadius: "20px",
   padding: "8px 20px",
   fontSize: "16px",
 });
-
+ 
 const StyledDialog = styled(Dialog)({
   "& .MuiDialog-paper": {
     padding: "20px",
@@ -79,7 +79,7 @@ const StyledDialog = styled(Dialog)({
     backgroundColor: "#fff",
   },
 });
-
+ 
 function PlainLot() {
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -89,51 +89,53 @@ function PlainLot() {
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [deleteLotId, setDeleteLotId] = useState(null);
-
+ 
+  const [page, setPage] = useState(1);
+  const [limit] = useState(24);
+  const [totalPage, setTotalPage] = useState(1);
+ 
   const navigate = useNavigate();
-
+ 
   useEffect(() => {
-    const fetchLots = async () => {
-      try {
-        const response = await axios.get(
-          `${REACT_APP_BACKEND_SERVER_URL}/api/v1/lot`,
-          { params: { type: "PLAIN", page: 1, limit: 1000 } }
-        );
-        console.log("Fetched Lots:", response.data);
-        if (Array.isArray(response.data.result)) {
-            setLotNumbers(response.data.result);
-        }
-        else {          
-          console.error(
-            "API response does not contain 'result' array:",
-            response.data
-          );
-          setLotNumbers([]);
-        }
-      } catch (error) {
-        console.error("Error fetching lots:", error);
+    fetchLots(1);
+  }, []);
+ 
+  const fetchLots = async (targetPage = 1) => {
+    try {
+      const res = await axios.get(
+        `${REACT_APP_BACKEND_SERVER_URL}/api/v1/lot`,
+        { params: { type: "PLAIN", page: targetPage, limit } }
+      );
+ 
+      if (Array.isArray(res.data.result)) {
+        setLotNumbers(res.data.result);
+        setTotalPage(res.data.totalPage);
+        setPage(targetPage);
+      } else {
         setLotNumbers([]);
       }
-    };
-
-    fetchLots();
-  }, []);
-
+ 
+    } catch (err) {
+      console.error("Error fetching lots:", err);
+      setLotNumbers([]);
+    }
+  };
+ 
   const handleClickOpen = () => {
     setOpen(true);
   };
-
+ 
   const handleClose = () => {
     setOpen(false);
     setLotNumber("");
   };
-
+ 
   const handleLotNumberChange = (e) => {
   const value = e.target.value.replace(/\D/g, ""); // numbers only
   setLotNumber(value);
-
+ 
   };
-
+ 
   const handleSaveLotNumber = async () => {
     if (lotNumber) {
       try {
@@ -149,18 +151,19 @@ function PlainLot() {
             }),
           }
         );
-
-
+ 
+ 
         const result = await response.json();
-
+ 
         console.log("Save Response:", result);
-
+ 
         if (response.ok) {
           const newLot = result.newLot;
-            setLotNumbers(prev => [newLot, ...prev]);
+            await fetchLots(1);  // always reload page 1
           console.log("New Lot:", newLot);
           setSuccessMessage("Lot created successfully!");
           setLotNumber("");
+          setSearchQuery("");
           handleClose();
         } else {
           console.error("Error:", result.msg);
@@ -174,28 +177,44 @@ function PlainLot() {
       setSuccessMessage("Lot Name is required.");
     }
   };
-
+ 
   const handleDeleteLotNumber = (index, lotId) => {
     setDeleteIndex(index);
     setDeleteLotId(lotId); // Store lot ID to delete
     setDeleteConfirmationOpen(true);
   };
-
+ 
   const confirmDelete = async () => {
     try {
-      // Make a DELETE request to remove the lot from the database
-       const response = await axios.put(
+      const response = await axios.put(
         `${REACT_APP_BACKEND_SERVER_URL}/api/v1/restoreLot/changetoDiactivate/${deleteLotId}`
       );
-
+ 
       if (response.status === 200) {
-        const updatedLotNumbers = lotNumbers.filter(
-          (lot, index) => index !== deleteIndex
-        );
-        setLotNumbers(updatedLotNumbers);
+        const newList = lotNumbers.filter((_, i) => i !== deleteIndex);
+ 
+        // CASE 1: Search mode → refresh search results
+        if (searchQuery.trim()) {
+          handleSearch(searchQuery);
+        }
+        else {
+          // CASE 2: Pagination mode
+          const isLastItemOnPage = newList.length === 0;
+          const isNotFirstPage = page > 1;
+ 
+          if (isLastItemOnPage && isNotFirstPage) {
+            // go to previous page
+            fetchLots(page - 1);
+          } else {
+            // stay on same page
+            fetchLots(page);
+          }
+        }
+ 
         setDeleteConfirmationOpen(false);
         setSuccessMessage("Lot deleted successfully");
-      } else {
+      }
+      else {
         setSuccessMessage("Failed to delete lot.");
       }
     } catch (error) {
@@ -203,36 +222,60 @@ function PlainLot() {
       setSuccessMessage("Error deleting lot.");
     }
   };
-
+ 
   const handleCloseSnackbar = () => {
     setSuccessMessage("");
   };
-
+ 
   const handleCloseDeleteDialog = () => {
     setDeleteConfirmationOpen(false);
     setDeleteIndex(null);
   };
-
+ 
   const handleViewLotDetails = (lot_id, lot_name) => {
-    console.log('lot_name',lot_name)
     navigate(`/plainlot/${lot_id}?lotname=${lot_name}`);
   };
-
-  const filteredLotNumbers = lotNumbers.filter((lot) =>
-    lot.lot_name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-
+ 
+  // const filteredLotNumbers = lotNumbers.filter((lot) =>
+  //   lot.lot_name.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+ 
+  const handleSearch = async (value) => {
+    setSearchQuery(value);
+ 
+    if (!value.trim()) {
+      fetchLots(1);
+      return;
+    }
+ 
+    try {
+      const res = await axios.get(`${REACT_APP_BACKEND_SERVER_URL}/api/v1/lot/search`, {
+        params: { type: "PLAIN", query: value }
+      });
+ 
+      if (Array.isArray(res.data.result)) {
+        setLotNumbers(res.data.result);
+        setTotalPage(1);
+        setPage(1);
+      }
+    } catch (err) {
+      console.error("Search error:", err);
+    }
+  };
+ 
+ 
+ 
+ 
   return (
     <>
       <Navbarr />
       <div className="background">
-             <Typography 
-            variant="h4" 
-            sx={{ 
+             <Typography
+            variant="h4"
+            sx={{
               marginBottom: "3rem",
-              textAlign: "center", 
-              fontWeight: "bold", 
+              textAlign: "center",
+              fontWeight: "bold",
               color: "#1A2A47",
               letterSpacing: "1px",
               animation: "fadeInDown 0.8s ease"
@@ -253,11 +296,11 @@ function PlainLot() {
               label="Search Lot Number"
               variant="outlined"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               placeholder="Search Lot No"
               fullWidth
             />
-            <IconButton 
+            <IconButton
               onClick={handleClickOpen}
               sx={{
                 // mt: "9rem",
@@ -273,7 +316,7 @@ function PlainLot() {
               <RiAddCircleFill size={42} />
             </IconButton>
           </Box>
-
+ 
           <Dialog open={open} onClose={handleClose}>
             <DialogTitle style={{ fontWeight: "bold" }}>Add Lot Number</DialogTitle>
             <DialogContent>
@@ -295,7 +338,7 @@ function PlainLot() {
               </Button>
             </DialogActions>
           </Dialog>
-
+ 
           <StyledDialog
             open={deleteConfirmationOpen}
             onClose={handleCloseDeleteDialog}
@@ -318,7 +361,7 @@ function PlainLot() {
               </StyledButton>
             </DialogActions>
           </StyledDialog>
-
+ 
           <Box
             sx={{
               display: "flex",
@@ -329,9 +372,9 @@ function PlainLot() {
               animation: "fadeInUp 0.8s ease 0.2s both"
             }}
           >
-            {filteredLotNumbers.length > 0 ? (
-              filteredLotNumbers.map((lot, index) => (
-                <StyledCard key={index} style={{ animationDelay: `${index * 0.06}s` }}>
+            {lotNumbers.length > 0 ? (
+              lotNumbers.map((lot, index) => (
+                <StyledCard key={`${lot.id}-${index}`} className={searchQuery ? "no-animation" : ""} style={searchQuery ? {} : { animationDelay: `${index * 0.06}s` }}>
                   <CardContent sx={{ textAlign: "center", backgroundColor: "#1A2A47", borderRadius: "18px 18px 0 0" }}>
                     <Typography
                       variant="h6"
@@ -367,8 +410,35 @@ function PlainLot() {
                 No Lot numbers available.
               </Typography>
             )}
+              
+      {searchQuery === "" && (
+        <Box className="pl-pagination pl-pagination--floating">
+          <Button
+            disabled={page <= 1}
+            onClick={() => fetchLots(page - 1)}
+            className={page <= 1 ? "" : ""}
+          >
+            ◀ Prev
+          </Button>
+ 
+          <Typography className="pl-page-indicator" sx={{ fontWeight: "bold", color: "#1A2A47" }}>
+            Page {page} of {totalPage}
+          </Typography>
+ 
+          <Button
+            disabled={page >= totalPage}
+            onClick={() => fetchLots(page + 1)}
+          >
+            Next ▶
+          </Button>
+        </Box>
+      )}
+ 
+ 
+ 
+ 
           </Box>
-
+ 
           <Snackbar open={!!successMessage} autoHideDuration={6000} onClose={handleCloseSnackbar}>
             <Alert onClose={handleCloseSnackbar} severity={successMessage.includes("Error") ? "error" : "success"} sx={{ width: "100%" }}>
               {successMessage}
@@ -379,5 +449,5 @@ function PlainLot() {
     </>
   );
 }
-
+ 
 export default PlainLot;

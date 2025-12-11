@@ -3,9 +3,9 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const {LOT_TYPE}=require("@prisma/client")
 // create new lot
-
+ 
 const postLotInfo = async (req, res, error) => {
-
+ 
   try {
     const {
       lot_name,
@@ -15,11 +15,11 @@ const postLotInfo = async (req, res, error) => {
       lot_process,
       type
     } = req.body;
-
-
-
+ 
+ 
+ 
     if (!lot_name) return res.status(400).json({ message: "LotName is Required" });
-
+ 
     // Traditional Prisma enum validation
     
     const validTypes = Object.values(LOT_TYPE); // ["STONE", "PLAIN"]
@@ -36,7 +36,7 @@ const postLotInfo = async (req, res, error) => {
           lot_name,
         },
       });
-
+ 
       if (!existingLot) {
         const newLot = await prisma.lot_info.create({
           data: {
@@ -62,18 +62,19 @@ const postLotInfo = async (req, res, error) => {
     return next(error);
   }
 };
-
+ 
 // fetch all lots
-
+ 
 const getAllLots = async (req, res, next) => {
-
+ 
   try {
      const page=req.query.page||1
-     const limit=req.query.limit||10
+     const rawLimit = parseInt(req.query.limit) || 10;
+     const limit = Math.min(rawLimit, 100);
      const type=req.query.type
-
+ 
      const skip=(page-1) * limit
-
+ 
     const validTypes = Object.values(LOT_TYPE); // ["STONE", "PLAIN"]
    
     if (!type || !validTypes.includes(type.toUpperCase())) {
@@ -81,7 +82,7 @@ const getAllLots = async (req, res, next) => {
         message: `Invalid Type. Allowed values: ${validTypes.join(", ")}`,
       });
     }
-
+ 
     const lots = await prisma.lot_info.findMany({
       where:{
         isAvailable:true,
@@ -94,17 +95,21 @@ const getAllLots = async (req, res, next) => {
       }
     });
      const totalCount = await prisma.lot_info.count({
-        where: { isAvailable: true },
+        where: {
+          isAvailable: true,
+          type: type.toUpperCase()
+        },
       });
-
+ 
+ 
     if (lots) {
      
       return res
         .status(200)
-        .json({ 
+        .json({
           totalCount,
           totalPage:Math.ceil(totalCount/limit),
-          msg: "successfully fetched", 
+          msg: "successfully fetched",
           result: lots });
     } else {
       return res.status(400).json({ msg: "failed to fetch lots" });
@@ -114,50 +119,61 @@ const getAllLots = async (req, res, next) => {
     return next(error);
   }
 };
-
-
-// const searchLots = async (req, res, next) => {
-//   try {
-//     const { query, type } = req.query;
  
-//     if (!query) {
-//       return res.status(400).json({ message: "Search query is required" });
-//     }
+const searchLots = async (req, res, next) => {
+  try {
+    const { query, type } = req.query;
  
-//     const validTypes = Object.values(LOT_TYPE);
-//     if (!validTypes.includes(type.toUpperCase())) {
-//       return res.status(400).json({
-//         message: `Invalid Type. Allowed values: ${validTypes.join(", ")}`,
-//       });
-//     }
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
  
-//     const results = await prisma.lot_info.findMany({
-//       where: {
-//         isAvailable: true,
-//         type: type.toUpperCase(),
-//         lot_name: {
-//          contains: query.toUpperCase()
-//         },
-//       },
-//       orderBy: { id: "desc" },
-//     });
+    const validTypes = Object.values(LOT_TYPE);
+    if (!validTypes.includes(type.toUpperCase())) {
+      return res.status(400).json({
+        message: `Invalid Type. Allowed values: ${validTypes.join(", ")}`,
+      });
+    }
  
-//     return res.status(200).json({ result: results });
+    const results = await prisma.lot_info.findMany({
+      where: {
+        isAvailable: true,
+        type: type.toUpperCase(),
+        lot_name: {
+         contains: query,
+        },
+      },
+      orderBy: { id: "desc" },
+    });
  
-//   } catch (error) {
-//     console.error(error);
-//     return next(error);
-//   }
-// };
-
+    const sortedResults = results.sort((a, b) => {
+    const q = query.toLowerCase();
+    const aExact = a.lot_name.toLowerCase() === q;
+    const bExact = b.lot_name.toLowerCase() === q;
+ 
+    if (aExact && !bExact) return -1;
+    if (!aExact && bExact) return 1;
+ 
+    return b.id - a.id; // fallback to newest first
+  });
+ 
+    return res.status(200).json({ result: sortedResults });
+ 
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+};
+ 
+ 
 // fetch lot items by id
-
+ 
 // const getLotById = async (req, res, next) => {
 //   try {
 //     const { lot_id } = req.body;
 //     console.log("jjjjjjjjjj", lot_id)
 //     if (lot_id) {
-
+ 
 //       const lot = await prisma.lot_info.findUnique({
 //         where: {
 //           id: Number(lot_id),
@@ -175,14 +191,14 @@ const getAllLots = async (req, res, next) => {
 //     return next(error);
 //   }
 // };
-
+ 
 // get Products by Lot Id
 const getLotById = async (req, res, next) => {
   try {
     const { id } = req.params;
    
     if(isNaN(id) || !id) return res.status(400).json({message:"Lot Id is Required"})
-
+ 
     // Check if lot_id is provided
     const existlot= await prisma.lot_info.findUnique({
       where:{
@@ -217,26 +233,26 @@ const getLotById = async (req, res, next) => {
  
  
 // delete a lot by id
-
+ 
 const deleteLot = async (req, res, next) => {
   try {
-
+ 
    const { selectedProduct } = req.body;  // [1,2,3]
    
     if (!selectedProduct || !Array.isArray(selectedProduct) || selectedProduct.length === 0) {
       return res.status(400).json({ message: "Selected product IDs required" });
     }
-
+ 
     // Convert all ids to integer
     const lotIds = selectedProduct.map(id => parseInt(id));
-
+ 
     // Check existing lots
     const existLot = await prisma.lot_info.findMany({
       where: {
         id: { in: lotIds }
       }
     });
-
+ 
     if (existLot.length === 0) {
       return res.status(404).json({ message: "No lots found for given IDs" });
     }
@@ -245,41 +261,41 @@ const deleteLot = async (req, res, next) => {
         id: { in: lotIds }
       },
      });
-
+ 
     return res.status(200).json({
       success: true,
       message: "Lots Deleted successfully",
       updatedCount: deletedLots.count
     });
-
-
-
+ 
+ 
+ 
   } catch (error) {
     console.log(error);
     return next(error);
   }
 };
-
+ 
 // update lot fields by id
-
+ 
 const updateLotData = async (req, res, next) => {
   try {
     const lot_id = req.body.lot_id;
     const bulk_weight_before = req.body.bulk_weight_before;
     const bulk_after_weight = req.body.bulk_after_weight;
     const lot_process = req.body.lot_process;
-
+ 
     if (lot_id) {
       const existingLot = await prisma.lot_info.findUnique({
         where: {
           id: Number(lot_id),
         },
       });
-
+ 
       if (!existingLot) {
         return res.status(404).json({ msg: "Lot not found" });
       }
-
+ 
       const updateData = {
         bulk_weight_before:
           bulk_weight_before !== undefined
@@ -292,14 +308,14 @@ const updateLotData = async (req, res, next) => {
         lot_process:
           lot_process !== undefined ? lot_process : existingLot.lot_process,
       };
-
+ 
       const updatedLot = await prisma.lot_info.update({
         where: {
           id: Number(lot_id),
         },
         data: updateData,
       });
-
+ 
       return res
         .status(200)
         .json({ msg: "successfully updated", result: updatedLot });
@@ -311,12 +327,13 @@ const updateLotData = async (req, res, next) => {
     return next(error);
   }
 };
-
+ 
 module.exports = {
   postLotInfo,
   getAllLots,
+  searchLots,
   getLotById,
   deleteLot,
   updateLotData,
-  // searchLots
 };
+ 

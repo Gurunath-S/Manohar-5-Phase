@@ -24,7 +24,7 @@ router.post("/lot_info", postLotInfo);
 // route - url/api/lot
 
 router.get("/", getAllLots);
-// router.get("/search", searchLots);
+router.get("/search", searchLots);
 
 // delete a lot
 // params : lot_id

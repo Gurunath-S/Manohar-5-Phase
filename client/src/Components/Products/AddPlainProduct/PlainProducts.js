@@ -691,39 +691,13 @@ const handleWeightData=async()=>{
                 {filterProducts.map((product, index) => (
                   <tr key={product.id || index}>
                     <td>{index + 1}</td>
-                    <td>
-                      <input value={product.product_number || product.product_id || product.id || ""} readOnly
-                      //  style={{pointerEvents: "none"}} 
-                       />
-                    </td>
-                    <td>
-                      <input value={product.productName || ""} 
-                      // style={{pointerEvents: "none"}}
-                       readOnly />
-                    </td>
-                    <td>
-                      <input value={product.workerName || ""} 
-                      // style={{pointerEvents: "none"}} 
-                      readOnly />
-                    </td>
-                    <td>
-                      <input value={product.grossWeight || ""} 
-                      // style={{pointerEvents: "none"}} 
-                      readOnly />
-                    </td>
-                    <td>
-                      <input value={product.stoneWeight || ""} 
-                      // style={{pointerEvents: "none"}} 
-                      readOnly />
-                    </td>
-                    <td>
-                      <input value={product.netWeight || ""} 
-                      // style={{pointerEvents: "none"}} 
-                      readOnly />
-                    </td>
-                    <td>
-                      <input style={{ fontSize: "0.95rem" }} value={ product.product_type==="active" ? "Active" : "Sold"}  readOnly />
-                    </td>
+                    <td>{product.product_number || product.product_id || product.id || ""}</td>
+                    <td>{product.productName || ""}</td>
+                    <td>{product.workerName || ""}</td>
+                    <td>{product.grossWeight || ""}</td>
+                    <td>{product.stoneWeight || ""} </td>
+                    <td>{product.netWeight || ""} </td>
+                    <td style={{ fontSize: "0.95rem" }} >{ product.product_type==="active" ? "Active" : "Sold"}</td>
                     <td>
                       <div className="icon" style={{ display: "flex", gap: 18, justifyContent: "center" }}>
                         <FontAwesomeIcon

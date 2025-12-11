@@ -650,8 +650,15 @@ const handleKeyDown = (e, nextField) => {
   const totalDifference = filterProducts.reduce((acc, product) => acc + parseFloat(product.difference || 0), 0).toFixed(3);
   const totalAdjustment = filterProducts.reduce((acc, product) => acc + parseFloat(product.adjustment || 0), 0).toFixed(3);
   const totalFinalWeight = filterProducts.reduce((acc, product) => acc + parseFloat(product.final_weight || 0), 0).toFixed(3);
-  const totalBarcodeWeight = filterProducts.reduce((acc, product) => acc + parseFloat(product.barcode_weight || 0), 0).toFixed(3);
- 
+ const totalBarcodeWeight = filterProducts.reduce((acc, product) => {
+    const weight = parseFloat(product?.barcode_weight);
+    // if weight is NaN, treat as 0
+   return acc + (isNaN(weight) ? 0 : weight);
+}, 0).toFixed(3);
+
+console.log("totalFinalWeight", totalBarcodeWeight);
+
+  
 useEffect(() => {
   const handleBarcodeScan = (e) => {
     setShowBarcode((prevData) => prevData + e.key);
@@ -780,54 +787,21 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
                 {filterProducts.map((product, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
+                    <td>{transform_text(product.product_number)}</td>
+                    <td>{product.before_weight || ""}</td>
+                    <td>{product.after_weight || ""}</td>
+                    <td>{product.difference?.toFixed(2) || ""}</td>
+                    <td>{product.adjustment?.toFixed(2) || ""}</td>
+                    <td>{product.final_weight?.toFixed(3) || ""}</td>
                     <td>
-                      <input
-                        value={transform_text(product.product_number)}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <input value={product.before_weight || ""} readOnly />
-                    </td>
-                    <td>
-                      <input value={product.after_weight || ""} readOnly />
-                    </td>
-                    <td>
-                      <input
-                        value={product.difference?.toFixed(2) || ""}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <input
-                        value={product.adjustment?.toFixed(2) || ""}
-                        readOnly
-                      />
-                    </td>
-                    <td>
-                      <input
-                       value={product.final_weight?.toFixed(3) || ""}
-                       readOnly
-                      
-                      />
-                    </td>
-                    <td>
-                      <input
-                       
-                       value={
+                      {
                         product.barcode_weight === "null"
                           ? ""
-                          : product.barcode_weight || ""
+                          :Number( product.barcode_weight).toFixed(3) || ""
                       }
-                      readOnly
-                      />
                     </td>
-                    <td>
-                      <input
-                        style={{ fontSize: "0.95rem" }}
-                        value={product.product_type || ""}
-                        readOnly
-                      />
+                    <td  style={{ fontSize: "0.95rem" }}>
+                       {product.product_type || ""}
                     </td>
                     <td>
                       <div className="stone-icon">
@@ -902,17 +876,9 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
                 <input value={(bulkWeightAfter-totalAfterWeight).toFixed(3)|| "-"} readOnly />
               </div>
               <button
+              className="exportPdfBtn"
           style={{
-            marginTop: "2rem",
-            marginBottom: "2rem",
-            marginLeft: "4rem",
-            height: "2rem",
-            width: "8rem",
-            fontWeight: "bold",
-            fontSize: "1rem",
-            borderRadius: "5px",
-            backgroundColor: "rgb(36, 36, 66)",
-            color: "white",
+           
           }}
           onClick={exportPDF}
         >
@@ -920,18 +886,7 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
         </button>
         <button
           onClick={() => handleBulkExportPdf(products)}
-          style={{
-            marginTop: "2rem",
-            marginBottom: "2rem",
-            marginLeft: "4rem",
-            height: "2rem",
-            width: "8rem",
-            fontWeight: "bold",
-            fontSize: "1rem",
-            borderRadius: "5px",
-            backgroundColor: "rgb(36, 36, 66)",
-            color: "white",
-          }}
+          className="printAllBtn"
         >
           Print All
         </button>
