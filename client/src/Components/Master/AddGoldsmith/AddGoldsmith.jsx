@@ -253,6 +253,7 @@ export default function AddGoldsmith() {
               <label>Goldsmith Code</label>
               <input
                 type="text"
+                maxLength={2}
                 value={goldSmithCode}
                 onChange={(e) => setGoldSmithCode(e.target.value)}
                 placeholder="Enter goldsmith code"
@@ -325,6 +326,7 @@ export default function AddGoldsmith() {
                         <td>
                           {editItemId === item.id ? (
                             <input
+                              maxLength={2}
                               type="text"
                               className="edit-input"
                               value={editCode}
