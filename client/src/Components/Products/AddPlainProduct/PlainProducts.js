@@ -247,10 +247,8 @@ const handleBulkExportPdf = async (items) => {
       // --- sanitize values
       console.log("item for pdf", item);
       const rawId = item.product_number ?? item.product_id ?? item.id ?? "";
-       
-      const cleanedId = String(rawId).trim().replace(/^PL\d+/, "");
       // make sure qrValue is a string and not "undefined"
-      let qrValue = cleanedId=== undefined || cleanedId === null ? "" : String(cleanedId).trim();
+      let qrValue = rawId === undefined || rawId === null ? "" : String(rawId).trim();
       // if qrValue empty, fallback to productName or an empty string
       if (!qrValue) qrValue = (item.productName ? String(item.productName) : "");
 
@@ -532,7 +530,7 @@ const handleWeightData=async()=>{
       return;
     }
 
-    if (!grossWeight) {
+    if (!grossWeight || !stoneWeight) {
       toast.error("Please enter weights");
       setSavingProduct(false);
       return;
@@ -695,7 +693,7 @@ const handleWeightData=async()=>{
                 {filterProducts.map((product, index) => (
                   <tr key={product.id || index}>
                     <td>{index + 1}</td>
-                    <td>{(product.product_number || product.product_id || product.id || "").replace(/^PL\d+/, "")}</td>
+                    <td>{product.product_number || product.product_id || product.id || ""}</td>
                     <td>{product.productName || ""}</td>
                     <td>{product.workerName || ""}</td>
                     <td>{product.grossWeight || ""}</td>
@@ -881,51 +879,23 @@ const handleWeightData=async()=>{
               
               {/* Left Side */}
               <div>
-                <label>Item (master)</label>
-  
-                
-<select
-  style={inputStyle}
-  value={itemsList.find(it => it.itemName === editProduct.productName)?.id || ""}
-  onChange={(e) => {
-    const selected = itemsList.find(it => it.id == e.target.value);
-    setEditProduct({
-      ...editProduct,
-      productName: selected?.itemName || "",
-      itemCode: selected?.itemCode || ""
-    });
-  }}
->
-<option value="">Select Item</option>
-  {itemsList.map(it => (
-<option key={it.id} value={it.id}>
-      {it.itemName} ({it.itemCode})
-</option>
-  ))}
-</select>
-
-
-               
-              <label>Goldsmith</label>
-<select
-  style={inputStyle}
-  value={goldsmithsList.find(gs => gs.name === editProduct.workerName)?.id || ""}
-  onChange={(e) => {
-    const selected = goldsmithsList.find(gs => gs.id == e.target.value);
-    setEditProduct({
-      ...editProduct,
-      workerName: selected?.name || "",
-      goldSmithCode: selected?.goldSmithCode || ""
-    });
-  }}
->
-<option value="">Select Goldsmith</option>
-  {goldsmithsList.map(gs => (
-<option key={gs.id} value={gs.id}>
-      {gs.name} ({gs.goldSmithCode})
-</option>
-  ))}
-</select>
+                <label>Product Name</label>
+                <input
+                  style={inputStyle}
+                  value={editProduct.productName}
+                  onChange={(e) => setEditProduct({ ...editProduct, productName: e.target.value })}
+                />
+                <label>Item Code</label>
+                  <input
+                    style={{ ...inputStyle, background: "#f5f5f5" }}
+                    value={
+                      editProduct.itemCode ||
+                      editProduct.itemcode ||
+                      itemsList.find(it => it.itemName === editProduct.productName)?.itemCode ||
+                      ""
+                    }
+                    readOnly
+                  />
                 <label style={{ marginTop: 8 }}>Worker Name</label>
                 <input
                   style={inputStyle}
@@ -1050,8 +1020,8 @@ const handleWeightData=async()=>{
                 alt="preview"
                 style={{
                   width: "100%",
-                  maxWidth: "20rem",
-                  height: "15rem",
+                  maxWidth: "280px",
+                  height: "auto",
                   borderRadius: "10px",
                   display: "block",
                   margin: "0 auto",
