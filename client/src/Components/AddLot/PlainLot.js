@@ -270,6 +270,7 @@ function PlainLot() {
     <>
       <Navbarr />
       <div className="background">
+        
              <Typography
             variant="h4"
             sx={{
@@ -292,6 +293,7 @@ function PlainLot() {
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 2,  animation: "fadeInUp 0.8s ease 0.1s both" }}>
+            <button className="plainlotBackBtn" onClick={() => navigate("/home")}><span> ←</span> Back</button>
             <RoundedTextField
               label="Search Lot Number"
               variant="outlined"

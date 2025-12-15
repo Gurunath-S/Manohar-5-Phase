@@ -54,6 +54,33 @@
     repeating-linear-gradient(55deg, transparent, transparent 20px, rgba(255, 255, 255, 0.02) 20px, rgba(255, 255, 255, 0.02) 40px);
   pointer-events: none;
 }
+/* log BackBtn */
+.stonelotBackBtn {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  background-color: #1A2A47;
+  color: white;
+  font-size: 15px;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+
+  /* transition */
+  transition: all 0.3s ease;
+}
+
+.stonelotBackBtn:hover {
+  background-color: #243a63;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.stonelotBackBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
 
 /* Pagination container */
 .sl-pagination {
