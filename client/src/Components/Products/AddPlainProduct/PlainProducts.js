@@ -842,9 +842,9 @@ const PlainProducts = () => {
                     </td>
                     <td>{product.productName || ""}</td>
                     <td>{product.workerName || ""}</td>
-                    <td>{product.grossWeight || ""}</td>
-                    <td>{product.stoneWeight || ""} </td>
-                    <td>{product.netWeight || ""} </td>
+                    <td>{parseFloat(product.grossWeight ||0).toFixed(3)}</td>
+                    <td>{parseFloat(product.stoneWeight||0).toFixed(3)}</td>
+                    <td>{parseFloat(product.netWeight ||0).toFixed(3)}</td>
                     <td style={{ fontSize: "0.95rem" }}>
                       {product.product_type === "active" ? "Active" : "Sold"}
                     </td>
