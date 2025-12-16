@@ -782,16 +782,16 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
+                     <tbody>
                 {filterProducts.map((product, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td >{transform_text(product.product_number)}</td>
-                    <td>{product.before_weight}</td>
-                    <td>{product.after_weight }</td>
-                    <td>{product.difference?.toFixed(2) }</td>
-                    <td>{product.adjustment?.toFixed(2) }</td>
-                    <td>{product.final_weight?.toFixed(3)}</td>
+                    <td>{(parseFloat(product.before_weight) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.after_weight ) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.difference) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.adjustment) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.product.final_weight ) || 0).toFixed(3)}</td>
                     <td>
                       {(parseFloat(product.barcode_weight) || 0).toFixed(3)}
                       {/* {
