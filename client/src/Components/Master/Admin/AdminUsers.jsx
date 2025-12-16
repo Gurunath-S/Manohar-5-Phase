@@ -703,7 +703,7 @@ async function handleDelete(u) {
 
         {/* Edit User Modal */}
         {selectedUser && (
-          <div className="modal-backdrop" onClick={closeModal}>
+          <div className="modal-backdrop">
             <div className="modal-card" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>✏️ Manage User: {selectedUser.userName}</h3>
