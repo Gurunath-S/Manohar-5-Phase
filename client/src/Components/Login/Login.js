@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import {REACT_APP_BACKEND_SERVER_URL} from '../../config/index'
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { FaUser } from "react-icons/fa";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
 import CircularProgress from '@mui/material/CircularProgress';
 import './Login.css';
  
@@ -11,11 +15,9 @@ export default function JewelryLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
      try {
-       setLoading(true);
       const res = await fetch(`${REACT_APP_BACKEND_SERVER_URL}/api/v1/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,12 +39,11 @@ export default function JewelryLogin() {
  
       const role = data.userInfo.role?.toLowerCase();
       toast.success("Login successful");
-      setLoading(false);
+ 
       if (role === "admin" || role === "superadmin") navigate("/admin");
       else navigate("/home");
     } catch (err) {
       toast.error("Server error");
-      setLoading(false);
     }
   };
  
@@ -65,7 +66,7 @@ export default function JewelryLogin() {
           <div className="input-group">
             <label htmlFor="username">Username</label>
             <div className="input-wrapper">
-              <span className="input-icon">👤</span>
+              <span className="input-icon"><FaUser /></span>
               <input
                 type="text"
                 id="username"
@@ -79,7 +80,7 @@ export default function JewelryLogin() {
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <div className="input-wrapper">
-              <span className="input-icon">🔒</span>
+              <span className="input-icon"><RiLockPasswordFill /></span>
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -92,7 +93,7 @@ export default function JewelryLogin() {
                 className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
           </div>
@@ -104,15 +105,15 @@ export default function JewelryLogin() {
             </label>
             <a href="#" className="forgot-password">Forgot Password?</a>
           </div> */}
-             
+ 
           <button type="button" className="login-button" onClick={handleSubmit} disabled={loading}>
             {loading ?
-
+ 
             // Login Loader...
           <>
              <div className='loader'>
                 <span>Signing In...</span>
-                <CircularProgress size="1.5rem" color='white'/> 
+                <CircularProgress size="1.5rem" color='white'/>
              </div>
           </>
            :
