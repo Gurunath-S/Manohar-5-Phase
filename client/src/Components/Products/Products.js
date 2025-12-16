@@ -791,7 +791,7 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
                     <td>{(parseFloat(product.after_weight ) || 0).toFixed(3)}</td>
                     <td>{(parseFloat(product.difference) || 0).toFixed(3)}</td>
                     <td>{(parseFloat(product.adjustment) || 0).toFixed(3)}</td>
-                    <td>{(parseFloat(product.product.final_weight ) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.final_weight ) || 0).toFixed(3)}</td>
                     <td>
                       {(parseFloat(product.barcode_weight) || 0).toFixed(3)}
                       {/* {
