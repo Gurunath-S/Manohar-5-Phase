@@ -41,6 +41,7 @@ exports.get_Diactivate_Lots = async (req, res) => {
     const search = req.query.search?.trim() || "";
 
     const skip = (page - 1) * limit;
+ 
 
     // Build dynamic search conditions
     let OR = [];
@@ -63,10 +64,12 @@ exports.get_Diactivate_Lots = async (req, res) => {
       OR.push({ type: "PLAIN" });
     }
 
-    const whereCondition = {
+    const whereCondition = { 
       isAvailable: false,
       ...(OR.length > 0 && { OR })
     };
+    
+    
 
     const deletedLots = await prisma.lot_info.findMany({
       where: whereCondition,

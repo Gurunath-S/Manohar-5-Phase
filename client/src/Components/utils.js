@@ -198,7 +198,7 @@ export const handleWeight = () => {
  
  
   export const weightVerifyBoth=(bulkWeightBefore,totalBeforeWeight,bulkWeightAfter,totalAfterWeight)=>{
-  let isTrue=""
+  let isTrue=true
   const before= (bulkWeightBefore - totalBeforeWeight).toFixed(3); // Fix to 3 decimals
   const after= (bulkWeightAfter - totalAfterWeight).toFixed(3);
   // Convert `before` back to a number for comparison
@@ -226,7 +226,7 @@ export const handleWeight = () => {
   }
  
   else{
-   
     alert(`Verify Success on Both weight difference`)
+    return isTrue
    }
 }

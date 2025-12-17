@@ -21,7 +21,8 @@ const RemoveLot = () => {
   });
   const [selectedProduct,setSelectedProduct]=useState({
       count:0,
-      selectedItems:[]
+      selectedItems:[],
+      lotNames:[]
   })
 
   const handleCloseSnackbar = () => {
@@ -62,6 +63,10 @@ const RemoveLot = () => {
     }
   }, [page, limit,search]);
 
+useEffect(() => {
+  setPage(1);
+}, [search]);
+
 
   const handleRestore = async () => {
     try {
@@ -89,7 +94,9 @@ const RemoveLot = () => {
       
          setSelectedProduct({
         count: 0,
-        selectedItems: []
+        selectedItems: [],
+        lotNames:[]
+        
        });
       }
     } catch (err) {
@@ -128,7 +135,8 @@ const RemoveLot = () => {
       
          setSelectedProduct({
         count: 0,
-        selectedItems: []
+        selectedItems: [],
+        lotNames:[]
        });
 
         
