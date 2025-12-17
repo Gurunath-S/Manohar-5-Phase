@@ -20,7 +20,7 @@ const Home = () => {
       <div className="home-root">
         <div className="home-content">
           <div className="welcome-section">
-            <h1 className="welcome-title">Welcome to Manohar Jewelry</h1>
+            <h1 className="welcome-title">Welcome to Manohar Jewellery </h1>
             <p className="welcome-subtitle">Select your product category to continue</p>
           </div>
 
@@ -33,7 +33,7 @@ const Home = () => {
                 </svg>
               </div>
               <h2 className="card-title">Plain Lot</h2>
-              <p className="card-description">Manage plain jewelry items and collections</p>
+              <p className="card-description">Manage plain Jewellery  items and collections</p>
               <div className="card-arrow">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
@@ -48,7 +48,7 @@ const Home = () => {
                 </svg>
               </div>
               <h2 className="card-title">Stone & Enamel Lot</h2>
-              <p className="card-description">Manage stone and enamel jewelry products</p>
+              <p className="card-description">Manage stone and enamel Jewellery  products</p>
               <div className="card-arrow">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>

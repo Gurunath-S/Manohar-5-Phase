@@ -644,7 +644,7 @@ const handleKeyDown = (e, nextField) => {
 
   
 
- 
+
   const totalBeforeWeight = filterProducts.reduce((acc, product) => acc + parseFloat(product.before_weight || 0), 0).toFixed(3);
   const totalAfterWeight = filterProducts.reduce((acc, product) => acc + parseFloat(product.after_weight || 0), 0).toFixed(3);
   const totalDifference = filterProducts.reduce((acc, product) => acc + parseFloat(product.difference || 0), 0).toFixed(3);

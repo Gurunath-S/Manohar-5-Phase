@@ -19,23 +19,27 @@ const RemovedLotTable = (props) => {
   
   const { removedLots, handleDelete, handleRestore ,loading,selectedProduct,setSelectedProduct, page, totalPage, setPage } = props;
 
-  const handleSelect = (id, checked) => {
+  const handleSelect = (id, checked,lotName) => {
   setSelectedProduct((prev) => {
     let updatedList = [...prev.selectedItems];
+    let updatedLotName=[...prev.lotNames]
 
     if (checked) {
       // Add id if not exist
       if (!updatedList.includes(id)) {
         updatedList.push(id);
+        updatedLotName.push(lotName)
       }
     } else {
       // Remove when unchecked
       updatedList = updatedList.filter((item) => item !== id);
+      updatedLotName=updatedLotName.filter((item)=>item!== lotName)
     }
 
     return {
       count: updatedList.length,
       selectedItems: updatedList,
+      lotNames:updatedLotName
     };
   });
 };
@@ -43,14 +47,17 @@ const RemovedLotTable = (props) => {
 const handleSelectAll = (checked) => {
   if (checked) {
     const allIds = removedLots.map((item) => item.id);
+    const allLotsName=removedLots.map((item) => item.lot_name)
     setSelectedProduct({
       count: allIds.length,
       selectedItems: allIds,
+      lotNames:allLotsName
     });
   } else {
     setSelectedProduct({
       count: 0,
       selectedItems: [],
+      lotNames:[]
     });
   }
 };
@@ -63,7 +70,7 @@ const handleSelectAll = (checked) => {
   const handleRestoreLot = () => {
      if(selectedProduct.selectedItems.length!==0){
          setOpen(true);
-         setConfirmMessage(`Are You Want To Restore The Selected Lots LOT ID: ${selectedProduct.selectedItems}`);
+         setConfirmMessage(`Are You Want To Restore The Selected Lots LOT NAME: ${selectedProduct.lotNames}`);
          setAccess("restore");
      }
    
@@ -75,7 +82,7 @@ const handleSelectAll = (checked) => {
       setOpen(true);
       setConfirmMessage(
       `Are you sure you want to permanently delete this lot? All products under this lot will also be removed.
-    LOT ID:  ${selectedProduct.selectedItems}`);
+      LOT NAME:  ${selectedProduct.lotNames}`);
       setAccess("delete");
      }
    
@@ -168,7 +175,7 @@ const handleSelectAll = (checked) => {
                     <input
                      type="checkbox"
                      checked={selectedProduct.selectedItems.includes(item.id)}
-                     onChange={(e) => handleSelect(item.id, e.target.checked)}
+                     onChange={(e) => handleSelect(item.id, e.target.checked,item.lot_name)}
                      />
                   </td>
                 </tr>
