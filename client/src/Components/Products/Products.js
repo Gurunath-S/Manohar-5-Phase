@@ -782,22 +782,23 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
+                     <tbody>
                 {filterProducts.map((product, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td >{transform_text(product.product_number)}</td>
-                    <td>{product.before_weight || ""}</td>
-                    <td>{product.after_weight || ""}</td>
-                    <td>{product.difference?.toFixed(2) || ""}</td>
-                    <td>{product.adjustment?.toFixed(2) || ""}</td>
-                    <td>{product.final_weight?.toFixed(3) || ""}</td>
+                    <td>{(parseFloat(product.before_weight) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.after_weight ) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.difference) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.adjustment) || 0).toFixed(3)}</td>
+                    <td>{(parseFloat(product.final_weight ) || 0).toFixed(3)}</td>
                     <td>
-                      {
+                      {(parseFloat(product.barcode_weight) || 0).toFixed(3)}
+                      {/* {
                         product.barcode_weight === "null"
                           ? ""
                           :Number( product.barcode_weight).toFixed(3) || ""
-                      }
+                      } */}
                     </td>
                     <td  style={{ fontSize: "0.95rem" }}>
                        {product.product_type || ""}
@@ -821,7 +822,7 @@ weightVerify("Before",bulkWeightBefore,totalBeforeWeight)
               <tfoot>
                 <tr>
                   <td colSpan="2" style={{textAlign:"center"}}>
-                    <b>Total Weight  </b>
+                    <b>Total Weight = </b>
                   </td>
                   <td style={{textAlign:"center"}}>
                     <b>{totalBeforeWeight}</b>

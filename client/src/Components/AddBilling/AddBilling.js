@@ -33,108 +33,67 @@ const AddBilling = () => {
   const [soldProducts, setSoldProducts] = useState(new Set());
   const [selectAllChecked, setSelectAllChecked] = useState(false); 
 
+const exportPDF = () => {
+  const input = document.getElementById("billPdf");
 
-const exportPDF = async () => {
-const doc = new jsPDF();
-doc.setFontSize(18);
-    // doc.text("Bill Details", 14, 22);
+  html2canvas(input, { scale: 2 }).then((canvas) => {
+    const pdf = new jsPDF("p", "mm", "a4");
 
-    const pageWidth = doc.internal.pageSize.width;  
-const textWidth = doc.getStringUnitWidth("Bill Details") * doc.internal.getFontSize(); 
-const xPos = (pageWidth - textWidth) / 2;  
-doc.text(`Bill Name : ${billName}`, 10, 22);
-doc.text("Bill Details", 85, 22); 
-doc.text(`Date:${new Date().toLocaleDateString("en-GB")}`,150,22)
-   
-    const columns = [];
-    if (selectedColumns.serialNo) columns.push({ title: "S.No", dataKey: "serialNo" });
-    if (selectedColumns.productNumber) columns.push({ title: "Product.No", dataKey: "productNumber" });
-    if (selectedColumns.beforeWeight) columns.push({ title: "Before Weight", dataKey: "beforeWeight" });
-    if (selectedColumns.afterWeight) columns.push({ title: "After Weight", dataKey: "afterWeight" });
-    if (selectedColumns.difference) columns.push({ title: "Difference", dataKey: "difference" });
-    if (selectedColumns.adjustment) columns.push({ title: "Adjustment", dataKey: "adjustment" });
-    if (selectedColumns.barcodeWeight) columns.push({ title: "Final Weight", dataKey: "barcodeWeight" });
-    if (selectedColumns.finalWeight) columns.push({ title: "Enamel Weight", dataKey: "finalWeight" });
-  
-    // Prepare table data
-    const tableData = scannedProducts.map((product, index) => {
-      const row = {};
-      if (selectedColumns.serialNo) row.serialNo = index + 1;
-      if (selectedColumns.productNumber) row.productNumber = transform_text(product.product_number);
-      if (selectedColumns.beforeWeight) row.beforeWeight = product.before_weight;
-      if (selectedColumns.afterWeight) row.afterWeight = product.after_weight;
-      if (selectedColumns.difference) row.difference = product.difference;
-      if (selectedColumns.adjustment) row.adjustment = product.adjustment;
-      if (selectedColumns.barcodeWeight) row.barcodeWeight = product.barcode_weight;
-      if (selectedColumns.finalWeight) row.finalWeight = product.final_weight;
-      return row;
-    });
-  
-    // Table configuration
-    doc.autoTable({
-      head: [columns.map((col) => col.title)],
-      body: tableData.map((row) => columns.map((col) => row[col.dataKey])),
-      startY: 30,
-      theme: "grid",
-      styles: {
-        font: "helvetica",
-        fontSize: 10,
-        lineWidth: 0.2,
-        lineColor: [0, 0, 0], 
-        cellPadding: 2,
-        halign: "center",
-        valign: "middle",
-      },
-      headStyles: {
-        fillColor: [36, 36, 66],
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
-      },
-      bodyStyles: {
-        fillColor: [255, 255, 255],
-        textColor: [0, 0, 0],
-      },
-      alternateRowStyles: {
-        fillColor: [240, 240, 240],
-      },
-      tableLineColor: [0, 0, 0],
-      tableLineWidth: 0.2,
-    });
-  
-   
-    const totalsRow = [];
-    if (selectedColumns.beforeWeight) totalsRow.push(totalBeforeWeight);
-    if (selectedColumns.afterWeight) totalsRow.push(totalAfterWeight);
-    if (selectedColumns.difference) totalsRow.push(totalDifference);
-    if (selectedColumns.adjustment) totalsRow.push(totalAdjustment);
-    if (selectedColumns.barcodeWeight) totalsRow.push(totalBarcodeWeight);
-    if (selectedColumns.finalWeight) totalsRow.push(totalFinalWeight);
-  
-    if (totalsRow.length) {
-      doc.autoTable({
-        body: [
-          
-          ["Total Weight", ...totalsRow ]
-        ],
-        startY: doc.lastAutoTable.finalY + 2, 
-        styles: {
-          fontStyle: "bold",
-          halign: "center",
-          textColor: [36, 36, 66],
-          cellPadding: 5,
-          lineWidth: 0, 
-          lineColor: [255, 255, 255], 
-          
-        },
-        theme: "grid",
-        tableLineWidth: 0,  
-      });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const margin = 5;
+
+    /* ---------------- HEADER ---------------- */
+
+    // TITLE
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(18);
+    pdf.text("Bill Details", pageWidth / 2, 15, { align: "center" });
+
+    // BILL NAME (LEFT)
+    pdf.setFontSize(13);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`Bill Name : ${billName}`, margin, 25);
+
+    // DATE (RIGHT)
+    pdf.text(
+      `Date : ${new Date().toLocaleDateString("en-GB")}`,
+      pageWidth - margin,
+      25,
+      { align: "right" }
+    );
+
+    /* ---------------- IMAGE CONTENT ---------------- */
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const imgWidth = pageWidth - margin * 2;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let yPosition = 35; // start AFTER header
+
+    pdf.addImage(imgData, "PNG", margin, yPosition, imgWidth, imgHeight);
+
+    let heightLeft = imgHeight - (pageHeight - yPosition);
+
+    /* ---------------- MULTI PAGE ---------------- */
+
+    while (heightLeft > 0) {
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight);
+      heightLeft -= pageHeight - margin;
     }
-  
-    const pdfName = billName.trim() ? `${billName}.pdf` : "billing_details.pdf";
-    doc.save(pdfName);
-  };
 
+    /* ---------------- SAVE ---------------- */
+
+    const pdfName = billName?.trim()
+      ? `${billName}.pdf`
+      : "billing_details.pdf";
+
+    pdf.save(pdfName);
+  });
+};
 
 
 
@@ -146,6 +105,7 @@ doc.text(`Date:${new Date().toLocaleDateString("en-GB")}`,150,22)
       const response = await axios.get(
         `${REACT_APP_BACKEND_SERVER_URL}/bills/bills/` + bill_number
       );
+      setBillName(response.data.billName.bill_name)
       setScannedProducts(response.data.products);
     } catch (error) {
       console.log("Error fetching bill data:", error);
@@ -295,7 +255,7 @@ doc.text(`Date:${new Date().toLocaleDateString("en-GB")}`,150,22)
           <h2> Bill Details</h2>
           <BarcodeReader onScan={handleScan} />
           <div className="addbill-table-wrapper">
-          <table className="addbill-table">
+          <table className="addbill-table" id="billPdf">
             <thead>
               <tr>
                 {selectedColumns.serialNo && <th>  S.No </th>}
@@ -355,7 +315,8 @@ doc.text(`Date:${new Date().toLocaleDateString("en-GB")}`,150,22)
             
             <tfoot>
               <tr className="bill-tfoot">
-                <td colSpan="2"><b>Total Weight </b></td>
+                <td colSpan={2}><b>Total Weight </b></td>
+                
                 {selectedColumns.beforeWeight && <td><b>{totalBeforeWeight}</b></td>}
                 {selectedColumns.afterWeight && <td><b>{totalAfterWeight}</b></td>}
                 {selectedColumns.difference && <td><b>{totalDifference}</b></td>}
@@ -368,7 +329,7 @@ doc.text(`Date:${new Date().toLocaleDateString("en-GB")}`,150,22)
           </div>
           </div>
 
-          {bill_number === "bill" && (
+          {bill_number === "bill" ? (
             <div className="addbill-name-wrapper">
               <input
                 type="text"
@@ -378,9 +339,17 @@ doc.text(`Date:${new Date().toLocaleDateString("en-GB")}`,150,22)
                 onChange={(e) => setBillName(e.target.value)}
               />
             </div>
-          )}
+          ):<div className="addbill-name-wrapper" >
+               <input
+                type="text"
+                readOnly
+                className="addbill-name-input"
+                value={billName}
+             
+              />
+            </div>}
           <div className="addbill-action-row">
-            <button className="addbill-btn" onClick={() => handleSellApprove("Sell")}> Save </button>
+            {bill_number==="bill" &&  <button className="addbill-btn" onClick={() => handleSellApprove("Sell")}> Save </button>}
             <button className="addbill-btn" onClick={exportPDF}>
               Export as PDF
             </button>
