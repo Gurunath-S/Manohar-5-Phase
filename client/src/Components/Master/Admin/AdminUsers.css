@@ -620,8 +620,8 @@
 }
 
 .checkbox-label {
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
   gap: 10px;
   padding: 12px 16px;
   background: #f7fafc;
