@@ -48,20 +48,6 @@ const Navbarr = () => {
       <img src={images} alt="Logo" onClick={()=>navigate('/home')} className="imge" />
 
       <div className="positionn">
-        {/* Billing */}
-        {canAccessBilling && (
-          <NavLink to="/billing">Billing</NavLink>
-        )}
-
-        {/* Restore */}
-        {canAccessRestore && (
-          <NavLink to="/restore">Restore</NavLink>
-        )}
-      {
-       deleteLotAccess &&(
-        <NavLink to="/removedLots">Deleted Lots</NavLink>
-      )
-      }
         {/* Master dropdown */}
         {(canCreateUsers || canAccessItems || canAccessGoldSmith) && (
           <div className="master-link">
@@ -81,6 +67,21 @@ const Navbarr = () => {
             </div>
           </div>
         )}
+        
+        {/* Billing */}
+        {canAccessBilling && (
+          <NavLink to="/billing">Billing</NavLink>
+        )}
+
+        {/* Restore */}
+        {canAccessRestore && (
+          <NavLink to="/restore">Restore</NavLink>
+        )}
+      {
+       deleteLotAccess &&(
+        <NavLink to="/removedLots">Deleted Lots</NavLink>
+      )
+      }
 
         <NavLink to="/home" className="hom">
           <FontAwesomeIcon icon={faHouse} />
