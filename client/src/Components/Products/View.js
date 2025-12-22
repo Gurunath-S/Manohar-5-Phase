@@ -512,6 +512,12 @@ const handleSave = async () => {
           [fieldName]: image
         }
       ]);
+
+      const previewUrl = URL.createObjectURL(image);
+        setCapturedImages(prev => ({
+          ...prev,
+          [fieldName]: previewUrl
+        }));
     
           try {
             const weight = await handleWeight();  // Await the function call and Weight Api
