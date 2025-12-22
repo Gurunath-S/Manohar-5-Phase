@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import "../AddBilling/AddBilling.css";
 import Table from "react-bootstrap/esm/Table";
 import jsPDF from "jspdf";
+import Switch from '@mui/material/Switch';
 import html2canvas from "html2canvas";
 import { useParams, useNavigate } from "react-router-dom";
 import BarcodeReader from "react-barcode-reader";
@@ -32,6 +33,8 @@ const AddBilling = () => {
   const { bill_number, bill_type } = useParams();
   const [soldProducts, setSoldProducts] = useState(new Set());
   const [selectAllChecked, setSelectAllChecked] = useState(false); 
+  const label = { inputProps: { 'aria-label': 'Color switch demo' } };
+
 
 const exportPDF = () => {
   const input = document.getElementById("billPdf");
@@ -118,7 +121,9 @@ const exportPDF = () => {
 
 
   const handleScan = async (product_number) => {
+    
     console.log('bill ProdutNo',product_number)
+
     if (soldProducts.has(product_number)) {
       alert("Product is already sold!");
       return;
@@ -142,6 +147,7 @@ const exportPDF = () => {
       }
     } catch (error) {
       console.error("Error fetching product:", error);
+      alert(error.response.data.msg)
     }
   };
 
@@ -241,14 +247,16 @@ const exportPDF = () => {
     return acc + parseFloat(product.final_weight || 0);
   }
   },0).toFixed(3)
-const getVisibleColumnCount = () => {
-  let count = 0;
+  
+// const getVisibleColumnCount = () => {
+//   let colSpan = 2;
+//   if(!selectedColumns.serialNo||!selectedColumns.productNumber){
+//       return colSpan=1
+//   }
+ 
 
-  if (selectedColumns.serialNo) count++;
-  if (selectedColumns.productNumber) count++;
-
-  return count;
-};
+//   return colSpan;
+// };
 
 
   return (
@@ -261,6 +269,7 @@ const getVisibleColumnCount = () => {
             ← Back
           </button>
           <h2> Bill Details</h2>
+          <Switch {...label} defaultChecked />
           <BarcodeReader onScan={handleScan} />
           <div className="addbill-table-wrapper">
           <table className="addbill-table" id="billPdf">
@@ -316,14 +325,15 @@ const getVisibleColumnCount = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9">No products found.</td>
+                  <td colSpan="8">No products found.</td>
                 </tr>
               )}
             </tbody>
             
             <tfoot>
               <tr className="bill-tfoot">
-                <td colSpan={getVisibleColumnCount()}><b>Total Weight </b></td>
+                {selectedColumns.serialNo && <td ><b>Total Weight </b></td>}
+                {selectedColumns.productNumber &&  <td><b>-</b></td>}
                 {selectedColumns.beforeWeight && <td><b>{totalBeforeWeight}</b></td>}
                 {selectedColumns.afterWeight && <td><b>{totalAfterWeight}</b></td>}
                 {selectedColumns.difference && <td><b>{totalDifference}</b></td>}

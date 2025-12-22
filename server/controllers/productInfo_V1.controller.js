@@ -206,7 +206,7 @@ const getProductByNumber = async (req, res) => {
     const { bill_number, product_number, bill_type } = req.params;
 
     // const billing_type = bill_type === "party" ? "hold" : "sold";
-
+    console.log('product_number',product_number)
     const product = await prisma.product_info.findMany({
       where: {
         product_number: product_number,
@@ -215,7 +215,7 @@ const getProductByNumber = async (req, res) => {
       },
     });
     if (product.length === 0) {
-      return res.status(500).json({ msg: "Product not found" });
+      return res.status(400).json({ msg: "Product Already Sold.." });
     }
     res.status(200).json({
       message: "Product found",
@@ -225,9 +225,10 @@ const getProductByNumber = async (req, res) => {
     console.log(error);
     res
       .status(500)
-      .json({ error: "An error occurred while fetching the product" });
+      .json({ error: error });
   }
 };
+
 
 const restoreProductByNumber = async (req, res) => {
   try {

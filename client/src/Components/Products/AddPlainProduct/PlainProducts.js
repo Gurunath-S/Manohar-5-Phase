@@ -397,11 +397,21 @@ const PlainProducts = () => {
        barcodeWeightText.style.fontWeight = "bold";
        barcodeWeightText.style.marginLeft = "7px";
        detailsContainer.appendChild(barcodeWeightText);
+
+      if(item.stoneWeight>0){
+       const stoneWeightText = document.createElement("span");
+       stoneWeightText.textContent = ` ${item.stoneWeight}`;
+       stoneWeightText.style.fontSize = "9px";
+       stoneWeightText.style.fontWeight = "bold";
+       stoneWeightText.style.marginLeft = "7px";
+       detailsContainer.appendChild(stoneWeightText);
+       }
+
        
        const productNumberText = document.createElement("span");
        productNumberText.textContent =cleanPlainProduct(item.product_number)||"";
        productNumberText.style.fontSize = "9px";
-       productNumberText.style.marginLeft = "4px";
+       productNumberText.style.marginLeft = "7px";
        productNumberText.style.fontWeight = "bold";
        productNumberText.style.color = "black";
        detailsContainer.appendChild(productNumberText);

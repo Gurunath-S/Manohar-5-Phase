@@ -7,23 +7,11 @@ const cloudinary = require('../config/cloudinary');
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => {
-
-    // get itemType from request body
-    const itemType = req.body.itemType; // "PLAIN" or "STONE"
-
-    let folderName = 'manoharJewellery/plain';
-
-    if (itemType === 'STONE') {
-      folderName = 'manoharJewellery/stone';
-    }
-
-    return {
-      folder: folderName,
-      allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
-      public_id: `${Date.now()}-${file.originalname.split('.')[0]}`
-    };
-  },
+  params:{
+      folder:"manoharJewellery",
+      allowed_formats: ['jpg', 'png', 'jpeg', 'webp'], 
+      // transformation: [{ width: 800, crop: 'limit' }],
+  }
 });
 
 const upload = multer({
